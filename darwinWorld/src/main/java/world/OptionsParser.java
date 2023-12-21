@@ -6,19 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OptionsParser {
-    public static List<MoveDirection> parse(String[] args) {
+    public static List<MoveDirection> parse(List<Integer> args) {
         List<MoveDirection> result = new ArrayList<>();
 
-        for (String arg : args) {
+        for (Integer arg : args) {
             switch (arg) {
-                case "f" -> result.add(MoveDirection.FORWARD);
-                case "fr" -> result.add(MoveDirection.FORWARD_RIGHT);
-                case "fl" -> result.add(MoveDirection.FORWARD_LEFT);
-                case "b" -> result.add(MoveDirection.BACKWARD);
-                case "br" -> result.add(MoveDirection.BACKWARD_RIGHT);
-                case "bl" -> result.add(MoveDirection.BACKWARD_LEFT);
-                case "r" -> result.add(MoveDirection.RIGHT);
-                case "l" -> result.add(MoveDirection.LEFT);
+                case 0 -> result.add(MoveDirection.FORWARD);
+                case 1 -> result.add(MoveDirection.FORWARD_RIGHT);
+                case 2 -> result.add(MoveDirection.RIGHT);
+                case 3 -> result.add(MoveDirection.BACKWARD_RIGHT);
+                case 4 -> result.add(MoveDirection.BACKWARD);
+                case 5 -> result.add(MoveDirection.BACKWARD_LEFT);
+                case 6 -> result.add(MoveDirection.LEFT);
+                case 7 -> result.add(MoveDirection.FORWARD_LEFT);
                 default -> throw new IllegalArgumentException(arg + " is not legal move specification");
             }
         }
