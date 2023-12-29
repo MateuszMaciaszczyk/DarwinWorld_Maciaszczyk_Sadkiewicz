@@ -24,42 +24,17 @@ public enum MapDirection {
         };
     }
 
-    public MapDirection next() {
-        return switch (this) {
-            case EAST -> SOUTH_EAST;
-            case WEST -> NORTH_WEST;
-            case NORTH -> NORTH_EAST;
-            case SOUTH -> SOUTH_WEST;
-            case NORTH_EAST -> EAST;
-            case NORTH_WEST -> NORTH;
-            case SOUTH_EAST -> SOUTH;
-            case SOUTH_WEST -> WEST;
-        };
-    }
-
-    public MapDirection previous() {
-        return switch (this) {
-            case EAST -> NORTH_EAST;
-            case WEST -> SOUTH_WEST;
-            case NORTH -> NORTH_WEST;
-            case SOUTH -> SOUTH_EAST;
-            case NORTH_EAST -> NORTH;
-            case NORTH_WEST -> WEST;
-            case SOUTH_EAST -> EAST;
-            case SOUTH_WEST -> SOUTH;
-        };
-    }
-
-    public Vector2d toUnitVector() {
-        return switch (this) {
-            case EAST -> new Vector2d(1, 0);
-            case WEST -> new Vector2d(-1, 0);
-            case NORTH -> new Vector2d(0, 1);
-            case SOUTH -> new Vector2d(0, -1);
-            case NORTH_EAST -> new Vector2d(1, 1);
-            case NORTH_WEST -> new Vector2d(-1, 1);
-            case SOUTH_EAST -> new Vector2d(1, -1);
-            case SOUTH_WEST -> new Vector2d(-1, -1);
+    public static Vector2d toUnitVector(int direction) {
+        return switch (direction) {
+            case 2 -> new Vector2d(1, 0);
+            case 6 -> new Vector2d(-1, 0);
+            case 0 -> new Vector2d(0, 1);
+            case 4 -> new Vector2d(0, -1);
+            case 1 -> new Vector2d(1, 1);
+            case 7 -> new Vector2d(-1, 1);
+            case 3 -> new Vector2d(1, -1);
+            case 5 -> new Vector2d(-1, -1);
+            default -> throw new IllegalStateException("Unexpected value: " + direction);
         };
     }
 }
