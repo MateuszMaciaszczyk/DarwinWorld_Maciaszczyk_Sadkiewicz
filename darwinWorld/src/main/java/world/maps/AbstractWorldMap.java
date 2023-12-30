@@ -1,26 +1,33 @@
 package world.maps;
 
+import world.basic.RandomPositionGenerator;
 import world.basic.Vector2d;
 import world.entities.Animal;
 import world.entities.Grass;
 import world.entities.WorldElement;
 import world.model.PositionAlreadyOccupiedException;
-import world.util.MapVisualizer;
 
 import java.util.*;
 
 public abstract class AbstractWorldMap implements WorldMap {
     protected Map<Vector2d, Animal> animals = new HashMap<>();
-    protected Map<world.basic.Vector2d, Grass> plants = new HashMap<>();
-    protected ArrayList<world.maps.MapChangeListener> mapChangeListeners = new ArrayList<>();
-    protected final MapVisualizer mapVisualizer;
+    protected Map<Vector2d, Grass> plants = new HashMap<>();
+    protected ArrayList<MapChangeListener> mapChangeListeners = new ArrayList<>();
     protected Vector2d lowerLeft;
     protected Vector2d upperRight;
     protected UUID id;
 
-    public AbstractWorldMap() {
-        this.mapVisualizer = new MapVisualizer(this);
+    public AbstractWorldMap(int grassNumber) {
         this.id = UUID.randomUUID();
+        generateGrass(grassNumber);
+    }
+
+    private void generateGrass(int grassNumber) {
+        int grassUpperRange = (int) (Math.sqrt(grassNumber * 10));
+        RandomPositionGenerator randomPositionGenerator = new RandomPositionGenerator(grassUpperRange, grassUpperRange, grassNumber);
+        for (Vector2d grassPosition : randomPositionGenerator) {
+            plants.put(grassPosition, new Grass(grassPosition, 5));
+        }
     }
 
     @Override
@@ -30,6 +37,22 @@ public abstract class AbstractWorldMap implements WorldMap {
         }
         animals.put(animal.getPosition(), animal);
         mapChanged("Animal placed at: " + animal.getPosition());
+    }
+
+    @Override
+    public void birth(Animal animal) {
+        // TO DO
+    }
+
+    @Override
+    public void eatGrass(Animal animal) {
+        Vector2d position = animal.getPosition();
+        System.out.println(plants);
+        if (plants.containsKey(position)) {
+            animal.gainEnergy(plants.get(position).getEnergy());
+            plants.remove(position);
+            mapChanged("Animal ate grass at: " + position);
+        }
     }
 
     public void move(Animal animal) {
@@ -56,17 +79,17 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     @Override
     public boolean isOccupied(Vector2d position) {
-        return animals.containsKey(position);
+        return animals.containsKey(position) || plants.containsKey(position);
     }
 
     @Override
     public WorldElement objectAt(Vector2d position) {
-        return animals.get(position);
-    }
-
-    public synchronized String toString() {
-        Boundary boundary = getCurrentBounds();
-        return mapVisualizer.draw(boundary.lowerLeft(), boundary.upperRight());
+        if (this.isOccupied(position)) {
+            if (animals.containsKey(position)) {
+                return animals.get(position);
+            }
+        }
+        return plants.get(position);
     }
 
     public Set<WorldElement> getElements() { return new HashSet<>(animals.values()); }
@@ -81,7 +104,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         mapChangeListeners.remove(listener);
     }
 
-    private synchronized void mapChanged(String message) {
+    public synchronized void mapChanged(String message) {
         for (MapChangeListener listener : mapChangeListeners) {
             listener.mapChanged(this, message);
         }

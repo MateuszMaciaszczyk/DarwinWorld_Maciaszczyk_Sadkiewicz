@@ -35,8 +35,9 @@ public class Simulation extends Thread{
         int i = 0;
         for (int move : moves) {
             try {
-                Thread.sleep(1000);
-                map.move(animals.get(i++ % animals.size()));
+                Thread.sleep(3000);
+                map.move(animals.get(i % animals.size()));
+                map.eatGrass(animals.get(i++ % animals.size()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

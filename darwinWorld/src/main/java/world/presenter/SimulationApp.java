@@ -5,7 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import world.maps.GrassField;
+import world.basic.Vector2d;
+import world.maps.Globe;
 
 import java.io.IOException;
 
@@ -16,9 +17,12 @@ public class SimulationApp extends Application {
         loader.setLocation(getClass().getClassLoader().getResource("simulation.fxml"));
         BorderPane viewRoot = loader.load();
         SimulationPresenter presenter = loader.getController();
-        GrassField grassField = new GrassField(7);
-        presenter.setWorldMap(grassField);
-        grassField.addMapChangeListener(presenter);
+//        GrassField grassField = new GrassField(7);
+//        presenter.setWorldMap(grassField);
+//        grassField.addMapChangeListener(presenter);
+        Globe globe = new Globe(new Vector2d(0, 0), new Vector2d(5, 5), 7);
+        presenter.setWorldMap(globe);
+        globe.addMapChangeListener(presenter);
 
         configureStage(primaryStage, viewRoot);
         primaryStage.show();
