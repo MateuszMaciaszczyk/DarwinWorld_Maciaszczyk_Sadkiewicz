@@ -5,21 +5,19 @@ import world.entities.Animal;
 import world.entities.Grass;
 import world.entities.WorldElement;
 import world.model.PositionAlreadyOccupiedException;
-import world.util.MapVisualizer;
+//import world.util.MapVisualizer;
 
 import java.util.*;
 
 public abstract class AbstractWorldMap implements WorldMap {
     protected Map<Vector2d, Animal> animals = new HashMap<>();
-    protected Map<world.basic.Vector2d, Grass> plants = new HashMap<>();
-    protected ArrayList<world.maps.MapChangeListener> mapChangeListeners = new ArrayList<>();
-    protected final MapVisualizer mapVisualizer;
+    protected Map<Vector2d, Grass> plants = new HashMap<>();
+    protected ArrayList<MapChangeListener> mapChangeListeners = new ArrayList<>();
     protected Vector2d lowerLeft;
     protected Vector2d upperRight;
     protected UUID id;
 
     public AbstractWorldMap() {
-        this.mapVisualizer = new MapVisualizer(this);
         this.id = UUID.randomUUID();
     }
 
@@ -30,6 +28,21 @@ public abstract class AbstractWorldMap implements WorldMap {
         }
         animals.put(animal.getPosition(), animal);
         mapChanged("Animal placed at: " + animal.getPosition());
+    }
+
+    @Override
+    public void birth(Animal animal) {
+        // TO DO
+    }
+
+    @Override
+    public void eatGrass(Animal animal) {
+        Vector2d position = animal.getPosition();
+        if (plants.containsKey(position)) {
+            animal.gainEnergy(plants.get(position).getEnergy());
+            plants.remove(position);
+            mapChanged("Animal ate grass at: " + position);
+        }
     }
 
     public void move(Animal animal) {
@@ -62,11 +75,6 @@ public abstract class AbstractWorldMap implements WorldMap {
     @Override
     public WorldElement objectAt(Vector2d position) {
         return animals.get(position);
-    }
-
-    public synchronized String toString() {
-        Boundary boundary = getCurrentBounds();
-        return mapVisualizer.draw(boundary.lowerLeft(), boundary.upperRight());
     }
 
     public Set<WorldElement> getElements() { return new HashSet<>(animals.values()); }

@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 public class GrassField extends AbstractWorldMap {
-    private final HashMap<Vector2d, Grass> grass = new HashMap<>();
+//    private final HashMap<Vector2d, Grass> grass = new HashMap<>();
 
     public GrassField(int grassNumber) {
         generateGrass(grassNumber);
@@ -22,7 +22,7 @@ public class GrassField extends AbstractWorldMap {
         int grassUpperRange = (int) (Math.sqrt(grassNumber * 10));
         RandomPositionGenerator randomPositionGenerator = new RandomPositionGenerator(grassUpperRange, grassUpperRange, grassNumber);
         for (Vector2d grassPosition : randomPositionGenerator) {
-            grass.put(grassPosition, new Grass(grassPosition));
+            plants.put(grassPosition, new Grass(grassPosition, 5));
         }
     }
 
@@ -31,20 +31,20 @@ public class GrassField extends AbstractWorldMap {
         if (super.isOccupied(position)) {
             return super.objectAt(position);
         } else {
-            return grass.get(position);
+            return plants.get(position);
         }
     }
 
     @Override
     public boolean isOccupied(Vector2d position) {
-        return super.isOccupied(position) || grass.containsKey(position);
+        return super.isOccupied(position) || plants.containsKey(position);
     }
 
     private Vector2d getLowerLeft() {
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;
 
-        for (Vector2d position : grass.keySet()) {
+        for (Vector2d position : plants.keySet()) {
             minX = Math.min(minX, position.getX());
             minY = Math.min(minY, position.getY());
         }
@@ -61,7 +61,7 @@ public class GrassField extends AbstractWorldMap {
         int maxX = 0;
         int maxY = 0;
 
-        for (Vector2d position : grass.keySet()) {
+        for (Vector2d position : plants.keySet()) {
             maxX = Math.max(maxX, position.getX());
             maxY = Math.max(maxY, position.getY());
         }
@@ -74,14 +74,10 @@ public class GrassField extends AbstractWorldMap {
         return new Vector2d(maxX, maxY);
     }
 
-    public HashMap<Vector2d, Grass> getGrass() {
-        return grass;
-    }
-
     @Override
     public Set<WorldElement> getElements() {
         Set<WorldElement> elements = super.getElements();
-        elements.addAll(grass.values());
+        elements.addAll(plants.values());
         return elements;
     }
 
