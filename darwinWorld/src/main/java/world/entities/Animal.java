@@ -12,6 +12,27 @@ public class Animal implements WorldElement {
     private int energy;
     private int pointer;  // pointer to the current gene
 
+    public int getOrientation() {
+        return orientation;
+    }
+
+    public void setPosition(Vector2d position) {
+        this.position = position;
+    }
+
+    public Vector2d getNextMove() {
+        return this.position.add(MapDirection.toUnitVector(getNextOrientation()));
+    }
+
+    public void iteratePointer(){
+        pointer = (pointer + 1) % genes.length;
+    }
+
+    public int getNextOrientation(){
+        int direction = genes[pointer];
+        return (orientation + direction) % 8;
+    }
+
     public Animal(Vector2d position) {
         this.position = position;
         this.energy = 10;
@@ -33,10 +54,8 @@ public class Animal implements WorldElement {
     }
 
     public void move(MoveValidator validator) {
-        int direction = genes[pointer];
-        int newOrientation = (orientation + direction) % 8;
-        this.position = this.position.add(MapDirection.toUnitVector(newOrientation));
-        this.orientation = newOrientation;
+        this.position = getNextMove();
+        this.orientation = getNextOrientation();
         pointer = (pointer + 1) % genes.length;
         energy--;
     }

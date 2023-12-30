@@ -47,6 +47,7 @@ public abstract class AbstractWorldMap implements WorldMap {
     @Override
     public void eatGrass(Animal animal) {
         Vector2d position = animal.getPosition();
+        System.out.println(plants);
         if (plants.containsKey(position)) {
             animal.gainEnergy(plants.get(position).getEnergy());
             plants.remove(position);
@@ -103,7 +104,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         mapChangeListeners.remove(listener);
     }
 
-    private synchronized void mapChanged(String message) {
+    public synchronized void mapChanged(String message) {
         for (MapChangeListener listener : mapChangeListeners) {
             listener.mapChanged(this, message);
         }
