@@ -1,7 +1,6 @@
 package world.maps;
 
 import world.entities.Animal;
-import world.model.PositionAlreadyOccupiedException;
 import world.basic.Vector2d;
 import world.entities.WorldElement;
 

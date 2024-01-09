@@ -1,8 +1,9 @@
-package world.model;
+package world.presenter;
 
 import world.basic.Vector2d;
 import world.entities.Animal;
 import world.maps.WorldMap;
+import world.maps.PositionAlreadyOccupiedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class Simulation extends Thread{
         int i = 0;
         for (int move : moves) {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
                 map.move(animals.get(i % animals.size()));
                 map.eatGrass(animals.get(i++ % animals.size()));
             } catch (InterruptedException e) {

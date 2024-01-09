@@ -5,7 +5,6 @@ import world.basic.Vector2d;
 import world.entities.Animal;
 import world.entities.Grass;
 import world.entities.WorldElement;
-import world.model.PositionAlreadyOccupiedException;
 
 import java.util.*;
 

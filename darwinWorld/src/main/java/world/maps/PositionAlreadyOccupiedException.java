@@ -1,4 +1,4 @@
-package world.model;
+package world.maps;
 
 import world.basic.Vector2d;
 
