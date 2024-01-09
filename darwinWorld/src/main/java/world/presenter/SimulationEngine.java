@@ -1,4 +1,6 @@
-package world.model;
+package world.presenter;
+
+import world.presenter.Simulation;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;

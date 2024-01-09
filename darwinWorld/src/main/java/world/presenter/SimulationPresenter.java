@@ -5,8 +5,6 @@ import world.entities.WorldElement;
 import world.maps.Boundary;
 import world.maps.MapChangeListener;
 import world.maps.WorldMap;
-import world.model.Simulation;
-import world.model.SimulationEngine;
 
 import java.util.ArrayList;
 import java.util.List;
