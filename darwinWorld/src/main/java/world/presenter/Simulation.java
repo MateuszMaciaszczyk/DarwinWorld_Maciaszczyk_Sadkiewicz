@@ -8,6 +8,7 @@ import world.maps.WorldMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.*;
 
 public class Simulation extends Thread{
     private final List<Animal> animals = new ArrayList<>();
@@ -66,15 +67,26 @@ public class Simulation extends Thread{
         return sum / animals.size();
     }
 
-    public List<Integer> getPopularGenes(){ //TODO
-        List<Integer> popularGenes = new ArrayList<>();
-        int[] genes = new int[genesNumber];
+    public int[] getPopularGenes(){
+        Map<int[], Integer> genotypeFrequency = new HashMap<>();
+
+        // Zliczanie wystąpień każdego genotypu
         for (Animal animal : animals) {
-            for (int i = 0; i < genesNumber; i++) {
-                genes[i] = animal.getGenes()[i];
+            int[] genes = animal.getGenes();
+            genotypeFrequency.put(genes, genotypeFrequency.getOrDefault(genes, 0) + 1);
+        }
+
+        // Znajdowanie najczęściej występującego genotypu
+        int[] mostPopularGenotype = new int[0];
+        int maxFrequency = 0;
+        for (Map.Entry<int[], Integer> entry : genotypeFrequency.entrySet()) {
+            if (entry.getValue() > maxFrequency) {
+                maxFrequency = entry.getValue();
+                mostPopularGenotype = entry.getKey();
             }
         }
-        return popularGenes;
+
+        return mostPopularGenotype;
     }
 
     public int getAverageEnergy(){
