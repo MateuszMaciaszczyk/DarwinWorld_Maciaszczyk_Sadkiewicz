@@ -6,8 +6,8 @@ import world.entities.Animal;
 import java.util.*;
 
 public class Globe extends AbstractWorldMap{
-    public Globe(int width, int height, int grassNumber, int costOfReproduction) {
-        super(width, height, grassNumber, costOfReproduction);
+    public Globe(int width, int height, int grassNumber, int costOfReproduction, int plantEnergy) {
+        super(width, height, grassNumber, costOfReproduction, plantEnergy);
     }
 
     @Override

@@ -15,12 +15,15 @@ public abstract class AbstractWorldMap implements WorldMap {
     protected Vector2d upperRight;
     protected UUID id;
     protected int costOfReproduction;
+    protected int plantEnergy;
 
-    public AbstractWorldMap(int width, int height, int grassNumber, int costOfReproduction) {
+    public AbstractWorldMap(int width, int height, int grassNumber, int costOfReproduction, int plantEnergy) {
         this.id = UUID.randomUUID();
         this.lowerLeft = new Vector2d(0, 0);
         this.upperRight = new Vector2d(width - 1, height - 1);
+        this.plantEnergy = plantEnergy;
         generateGrass(grassNumber);
+        this.costOfReproduction = costOfReproduction;
     }
 
     private void generateGrass(int grassNumber) {
@@ -58,7 +61,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         while (plants.containsKey(grassPosition)) {
             grassPosition = getPreferredPosition();
         }
-        plants.put(grassPosition, new Grass(grassPosition, 5));
+        plants.put(grassPosition, new Grass(grassPosition, plantEnergy));
     }
 
     @Override
@@ -109,10 +112,9 @@ public abstract class AbstractWorldMap implements WorldMap {
     }
 
     public Vector2d getPreferredPosition() {
-        int preferredHeight = (upperRight.getY() - lowerLeft.getY()) / 5; // 20% of the map height
+        int preferredHeight = (upperRight.getY() - lowerLeft.getY() + 1) / 5; // 20% of the map height
         int preferredLowerY = lowerLeft.getY() + 2 * preferredHeight;
         int preferredUpperY = upperRight.getY() - 2 * preferredHeight;
-
         double chance = Math.random();
         int x, y;
 

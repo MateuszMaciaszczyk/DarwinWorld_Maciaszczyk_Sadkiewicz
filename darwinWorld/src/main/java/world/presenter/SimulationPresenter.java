@@ -54,10 +54,6 @@ public class SimulationPresenter implements MapChangeListener {
         this.animalEnergy = animalEnergy;
     }
 
-    public void setPlantEnergy(int plantEnergy) {
-        this.plantEnergy = plantEnergy;
-    }
-
     public void setReproduceReady(int reproduceReady) {
         this.reproduceReady = reproduceReady;
     }

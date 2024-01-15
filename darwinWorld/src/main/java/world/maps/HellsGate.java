@@ -7,8 +7,8 @@ import java.util.Random;
 public class HellsGate extends AbstractWorldMap{
     private final Random random = new Random();
 
-    public HellsGate(int width, int height, int grassNumber, int costOfReproduction) {
-        super(width, height, grassNumber, costOfReproduction);
+    public HellsGate(int width, int height, int grassNumber, int costOfReproduction, int plantEnergy) {
+        super(width, height, grassNumber, costOfReproduction, plantEnergy);
     }
 
     @Override
