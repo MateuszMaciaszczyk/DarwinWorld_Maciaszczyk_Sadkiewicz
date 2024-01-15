@@ -65,14 +65,13 @@ public class StartPresenter {
         SimulationPresenter simulationPresenter = loader.getController();
 
         // TODO - add map variant choice
-        HellsGate hellsGate = new HellsGate(width, height, plantNumber, reproduceEnergyCost);
+        HellsGate hellsGate = new HellsGate(width, height, plantNumber, reproduceEnergyCost, plantEnergy);
         hellsGate.addMapChangeListener(simulationPresenter);
 
         simulationPresenter.setAnimalsAmount(animalsNumber);
         simulationPresenter.setMap(hellsGate);
         simulationPresenter.setAnimalEnergy(startingAnimalEnergy);
         simulationPresenter.setSpawningPlantsAmount(numberOfSpawningPlant);
-        simulationPresenter.setPlantEnergy(plantEnergy);
         simulationPresenter.setReproduceReady(reproduceReady);
         simulationPresenter.setReproduceEnergyCost(reproduceEnergyCost);
         simulationPresenter.setMinGeneMutation(minGeneMutation);
