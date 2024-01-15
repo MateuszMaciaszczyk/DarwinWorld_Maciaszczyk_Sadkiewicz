@@ -11,7 +11,7 @@ public class SimulationStatistics {
     private int averageEnergy = 0;
     private int averageLifeLength = 0;
     private int averageChildrenNumber = 0;
-    private List<Integer> popularGenes;
+    private int[] popularGenes;
 
     public SimulationStatistics(Simulation simulation) {
         this.simulation = simulation;
@@ -22,5 +22,51 @@ public class SimulationStatistics {
         this.averageLifeLength = simulation.getAverageLifeLength();
         this.averageChildrenNumber = simulation.getAverageChildrenNumber();
         this.popularGenes = simulation.getPopularGenes();
+    }
+
+    public void updateStatistics(){
+        this.animalAmount = simulation.getAnimalAmount();
+        this.grassAmount = simulation.getGrassAmount();
+        this.freeSpace = simulation.getFreeSpace();
+        this.averageEnergy = simulation.getAverageEnergy();
+        this.averageLifeLength = simulation.getAverageLifeLength();
+        this.averageChildrenNumber = simulation.getAverageChildrenNumber();
+        this.popularGenes = simulation.getPopularGenes();
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public int getAnimalAmount() {
+        return animalAmount;
+    }
+
+    public int getGrassAmount() {
+        return grassAmount;
+    }
+
+    public int getFreeSpace() {
+        return freeSpace;
+    }
+
+    public int getAverageEnergy() {
+        return averageEnergy;
+    }
+
+    public int getAverageLifeLength() {
+        return averageLifeLength;
+    }
+
+    public int getAverageChildrenNumber() {
+        return averageChildrenNumber;
+    }
+
+    public int[] getPopularGenes() {
+        return popularGenes;
+    }
+
+    public void nextDay(){
+        day++;
     }
 }

@@ -110,6 +110,10 @@ public class Animal implements WorldElement {
         return energy;
     }
 
+    public boolean isAlive() {
+        return alive;
+    }
+
     public void die() {
         this.alive = false;
         this.death = this.age;
