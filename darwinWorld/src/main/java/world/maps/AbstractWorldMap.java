@@ -1,6 +1,5 @@
 package world.maps;
 
-import world.basic.RandomPositionGenerator;
 import world.basic.Vector2d;
 import world.entities.Animal;
 import world.entities.Grass;
@@ -9,71 +8,67 @@ import world.entities.WorldElement;
 import java.util.*;
 
 public abstract class AbstractWorldMap implements WorldMap {
-    protected Map<Vector2d, Animal> animals = new HashMap<>();
+    protected Map<Vector2d,Animal> animals = new HashMap<>();
     protected Map<Vector2d, Grass> plants = new HashMap<>();
     protected ArrayList<MapChangeListener> mapChangeListeners = new ArrayList<>();
     protected Vector2d lowerLeft;
     protected Vector2d upperRight;
     protected UUID id;
+    protected int costOfReproduction;
 
-    public AbstractWorldMap(int grassNumber) {
+    public AbstractWorldMap(int width, int height, int grassNumber, int costOfReproduction) {
         this.id = UUID.randomUUID();
+        this.lowerLeft = new Vector2d(0, 0);
+        this.upperRight = new Vector2d(width - 1, height - 1);
         generateGrass(grassNumber);
     }
 
     private void generateGrass(int grassNumber) {
-        int grassUpperRange = (int) (Math.sqrt(grassNumber * 10));
-        RandomPositionGenerator randomPositionGenerator = new RandomPositionGenerator(grassUpperRange, grassUpperRange, grassNumber);
-        for (Vector2d grassPosition : randomPositionGenerator) {
-            plants.put(grassPosition, new Grass(grassPosition, 5));
+        for (int i = 0; i < grassNumber; i++) {
+            this.placePlants();
         }
     }
 
     @Override
-    public void place(Animal animal) throws PositionAlreadyOccupiedException {
-        if (!canMoveTo(animal.getPosition())) {
-            throw new PositionAlreadyOccupiedException(animal.getPosition());
+    public int getGrassesNumber() {
+        return plants.size();
+    }
+
+    @Override
+    public int getFreeSpaceNumber() {
+        int freeSpaceNumber = 0;
+        for (int i = 0; i < upperRight.getX(); i++) {
+            for (int j = 0; j < lowerLeft.getY(); j++) {
+                if (!isOccupied(new Vector2d(i, j))) {
+                    freeSpaceNumber++;
+                }
+            }
         }
+        return freeSpaceNumber;
+    }
+
+    @Override
+    public void place(Animal animal){
         animals.put(animal.getPosition(), animal);
         mapChanged("Animal placed at: " + animal.getPosition());
     }
 
-    @Override
-    public void birth(Animal animal) {
-        // TO DO
+    public void placePlants() {
+        Vector2d grassPosition = getPreferredPosition();
+        while (plants.containsKey(grassPosition)) {
+            grassPosition = getPreferredPosition();
+        }
+        plants.put(grassPosition, new Grass(grassPosition, 5));
     }
 
     @Override
     public void eatGrass(Animal animal) {
         Vector2d position = animal.getPosition();
-        System.out.println(plants);
         if (plants.containsKey(position)) {
             animal.gainEnergy(plants.get(position).getEnergy());
             plants.remove(position);
             mapChanged("Animal ate grass at: " + position);
         }
-    }
-
-    public void move(Animal animal) {
-        Vector2d oldPosition = animal.getPosition();
-        animals.remove(animal.getPosition());
-        animal.move(this);
-        animals.put(animal.getPosition(), animal);
-        if (!oldPosition.equals(animal.getPosition())) {
-            mapChanged("Animal moved to: " + animal.getPosition());
-        }
-        else {
-            System.out.println("Animal did not move");
-        }
-    }
-
-    @Override
-    public boolean canMoveTo(Vector2d position) {
-        boolean canMove = position.follows(lowerLeft) && position.precedes(upperRight) && !animals.containsKey(position);
-        if (!canMove) {
-            System.out.println("Animal cannot move to: " + position);
-        }
-        return canMove;
     }
 
     @Override
@@ -111,5 +106,39 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     public UUID getId() {
         return id;
+    }
+
+    public Vector2d getPreferredPosition() {
+        int preferredHeight = (upperRight.getY() - lowerLeft.getY()) / 5; // 20% of the map height
+        int preferredLowerY = lowerLeft.getY() + 2 * preferredHeight;
+        int preferredUpperY = upperRight.getY() - 2 * preferredHeight;
+
+        double chance = Math.random();
+        int x, y;
+
+        if (chance <= 0.8) {
+            // Generate position in the preferred area
+            x = (int)(Math.random() * (upperRight.getX() - lowerLeft.getX() + 1)) + lowerLeft.getX();
+            y = (int)(Math.random() * (preferredUpperY - preferredLowerY + 1)) + preferredLowerY;
+        } else {
+            // Generate position outside the preferred area
+            if (Math.random() < 0.5) {
+                // Generate position in the lower non-preferred area
+                x = (int)(Math.random() * (upperRight.getX() - lowerLeft.getX() + 1)) + lowerLeft.getX();
+                y = (int)(Math.random() * (preferredLowerY - lowerLeft.getY() + 1)) + lowerLeft.getY();
+            } else {
+                // Generate position in the upper non-preferred area
+                x = (int)(Math.random() * (upperRight.getX() - lowerLeft.getX() + 1)) + lowerLeft.getX();
+                y = (int)(Math.random() * (upperRight.getY() - preferredUpperY + 1)) + preferredUpperY;
+            }
+        }
+
+        return new Vector2d(x, y);
+    }
+
+    @Override
+    public void removeDeadAnimal(Animal animal) {
+        animals.remove(animal.getPosition());
+        animal.die();
     }
 }

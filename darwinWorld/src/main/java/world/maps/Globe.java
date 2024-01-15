@@ -3,11 +3,11 @@ package world.maps;
 import world.basic.Vector2d;
 import world.entities.Animal;
 
+import java.util.*;
+
 public class Globe extends AbstractWorldMap{
-    public Globe(Vector2d lowerLeft, Vector2d upperRight, int grassNumber) {
-        super(grassNumber);
-        super.lowerLeft = lowerLeft;
-        super.upperRight = upperRight;
+    public Globe(int width, int height, int grassNumber, int costOfReproduction) {
+        super(width, height, grassNumber, costOfReproduction);
     }
 
     @Override

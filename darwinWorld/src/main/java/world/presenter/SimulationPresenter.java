@@ -1,5 +1,4 @@
 package world.presenter;
-import world.OptionsParser;
 import world.basic.Vector2d;
 import world.entities.WorldElement;
 import world.maps.Boundary;
@@ -17,20 +16,71 @@ import javafx.scene.control.Button;
 import javafx.geometry.Pos;
 
 
-
 public class SimulationPresenter implements MapChangeListener {
     private WorldMap worldMap;
+    private int animalsAmount;
+    private int spawningPlantsAmount;
+    private int animalEnergy;
+    private int plantEnergy;
+    private int reproduceReady;
+    private int reproduceEnergyCost;
+    private int minGeneMutation;
+    private int maxGeneMutation;
+    private int genomeLength;
     public void setWorldMap(WorldMap map) {
         this.worldMap = map;
     }
-    @FXML
-    private Label infoLabel;
-    @FXML
-    private TextField movesListTextField;
-    @FXML
-    private Label moveInfoLabel;
+    private int day = 0;
     @FXML
     private Button startButton;
+    @FXML
+    private Button startStopButton;
+    @FXML
+    private TextField mapWidthField;
+    @FXML
+    private TextField mapHeightField;
+    @FXML
+    private GridPane mapGrid;
+
+    public void setAnimalsAmount(int amount) {
+        this.animalsAmount = amount;
+    }
+
+    public void setSpawningPlantsAmount(int spawningPlantsAmount) {
+        this.spawningPlantsAmount = spawningPlantsAmount;
+    }
+
+    public void setAnimalEnergy(int animalEnergy) {
+        this.animalEnergy = animalEnergy;
+    }
+
+    public void setPlantEnergy(int plantEnergy) {
+        this.plantEnergy = plantEnergy;
+    }
+
+    public void setReproduceReady(int reproduceReady) {
+        this.reproduceReady = reproduceReady;
+    }
+
+    public void setReproduceEnergyCost(int reproduceEnergyCost) {
+        this.reproduceEnergyCost = reproduceEnergyCost;
+    }
+
+    public void setMinGeneMutation(int minGeneMutation) {
+        this.minGeneMutation = minGeneMutation;
+    }
+
+    public void setMaxGeneMutation(int maxGeneMutation) {
+        this.maxGeneMutation = maxGeneMutation;
+    }
+
+    public void setGenomeLength(int genomeLength) {
+        this.genomeLength = genomeLength;
+    }
+
+    public void setMap(WorldMap map) {
+        this.worldMap = map;
+    }
 
     private void clearGrid() {
         mapGrid.getChildren().retainAll(mapGrid.getChildren().get(0));
@@ -38,43 +88,11 @@ public class SimulationPresenter implements MapChangeListener {
         mapGrid.getRowConstraints().clear();
     }
 
-    private void drawAxes(Boundary boundary) {
-        drawXAxis(boundary);
-        drawYAxis(boundary);
-        Label label = new Label("x/y");
-        label.setMinWidth(50);
-        label.setMinHeight(50);
-        label.setAlignment(Pos.CENTER);
-        mapGrid.add(label, 0, 0);
-    }
-
-    private void drawXAxis(Boundary boundary) {
-        for (int j = boundary.lowerLeft().getX(); j <= boundary.upperRight().getX(); j++) {
-            Label label = new Label(Integer.toString(j));
-            label.setMinWidth(50);
-            label.setMinHeight(50);
-            label.setAlignment(Pos.CENTER);
-            mapGrid.add(label, j + 1 - boundary.lowerLeft().getX(), 0); // Dodajemy etykiety osi X na górze siatki
-        }
-    }
-
-    private void drawYAxis(Boundary boundary) {
-        for (int i = boundary.lowerLeft().getY(); i <= boundary.upperRight().getY(); i++) {
-            Label label = new Label(Integer.toString(i));
-            label.setMinWidth(50);
-            label.setMinHeight(50);
-            label.setAlignment(Pos.CENTER);
-            mapGrid.add(label, 0, boundary.upperRight().getY() - i + 1); // Dodajemy etykiety osi Y po lewej stronie siatki
-        }
-    }
-
     @FXML
     public void drawMap() {
         clearGrid();
         Boundary boundary = worldMap.getCurrentBounds();
-        drawAxes(boundary);
         drawGrid(boundary);
-        infoLabel.setText("");
     }
 
     private void drawGrid(Boundary boundary) {
@@ -105,27 +123,18 @@ public class SimulationPresenter implements MapChangeListener {
         return label;
     }
 
-
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
         Platform.runLater(() -> {
-            this.drawMap();
-            moveInfoLabel.setText(message);
+            drawMap();
+            day++;
         });
     }
+
     @FXML
-    public void onSimulationStartClicked() {
-        String movesString = movesListTextField.getText();
-        try {
-            List<Integer> movesList = OptionsParser.parse(movesString.split(""));
-            Simulation simulation = new Simulation(movesList, List.of(new Vector2d(2,2) , new Vector2d(5,5)), worldMap);
-            SimulationEngine simulationEngine = new SimulationEngine(new ArrayList<>(List.of(simulation)));
-            simulationEngine.runAsync();
-            Platform.runLater(() -> startButton.setDisable(true));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    public void onStartStopClicked() {  //TODO add stop button
+        Simulation simulation = new Simulation(animalsAmount, worldMap, animalEnergy, genomeLength, reproduceReady, reproduceEnergyCost, minGeneMutation, maxGeneMutation, spawningPlantsAmount);
+        SimulationEngine simulationEngine = new SimulationEngine(new ArrayList<>(List.of(simulation)));
+        simulationEngine.runAsync();
     }
-    @FXML
-    private GridPane mapGrid;
 }

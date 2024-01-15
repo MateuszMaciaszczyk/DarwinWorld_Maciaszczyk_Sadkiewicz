@@ -20,11 +20,15 @@ public interface WorldMap extends MoveValidator {
      *
      * @param animal The animal to place on the map.
      */
-    void place(Animal animal) throws PositionAlreadyOccupiedException;
-
-    void birth(Animal animal);
+    void place(Animal animal);
 
     void eatGrass(Animal animal);
+
+    void removeDeadAnimal(Animal animal);
+
+    int getGrassesNumber();
+
+    int getFreeSpaceNumber();
 
     /**
      * Moves an animal (if it is present on the map) according to specified direction.
@@ -57,4 +61,6 @@ public interface WorldMap extends MoveValidator {
     void addMapChangeListener(MapChangeListener consoleMapDisplay);
 
     UUID getId();
+
+    void placePlants();
 }
