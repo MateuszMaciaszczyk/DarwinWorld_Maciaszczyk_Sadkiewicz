@@ -30,6 +30,24 @@ public abstract class AbstractWorldMap implements WorldMap {
     }
 
     @Override
+    public int getGrassesNumber() {
+        return plants.size();
+    }
+
+    @Override
+    public int getFreeSpaceNumber() {
+        int freeSpaceNumber = 0;
+        for (int i = 0; i < upperRight.getX(); i++) {
+            for (int j = 0; j < lowerLeft.getY(); j++) {
+                if (!isOccupied(new Vector2d(i, j))) {
+                    freeSpaceNumber++;
+                }
+            }
+        }
+        return freeSpaceNumber;
+    }
+
+    @Override
     public void place(Animal animal){
         animals.put(animal.getPosition(), animal);
         mapChanged("Animal placed at: " + animal.getPosition());
@@ -46,7 +64,6 @@ public abstract class AbstractWorldMap implements WorldMap {
     @Override
     public void eatGrass(Animal animal) {
         Vector2d position = animal.getPosition();
-        System.out.println(plants);
         if (plants.containsKey(position)) {
             animal.gainEnergy(plants.get(position).getEnergy());
             plants.remove(position);

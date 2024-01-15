@@ -4,6 +4,9 @@ import world.basic.MapDirection;
 import world.maps.MoveValidator;
 import world.basic.Vector2d;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Animal implements WorldElement {
     private Vector2d position;
@@ -11,6 +14,46 @@ public class Animal implements WorldElement {
     private int[] genes;
     private int energy;
     private int pointer;  // pointer to the current gene
+    private int reproductionEnergyCost;
+    private int energyToReproduce;
+    private int minGeneMutation;
+    private int maxGeneMutation;
+    private boolean alive = true;
+    private int age = 0;
+    private int childs = 0;
+    private int offspring = 0;
+    private int death = 0;
+    List<Animal> parents = new ArrayList<>();
+
+    public Animal(Vector2d position, int energy, int genesNumber, int reproductionEnergyCost, int energyToReproduce ) {
+        this.position = position;
+        this.energy = energy;
+        this.orientation = (int)(Math.random() * 8);
+        this.pointer = 0;
+        this.reproductionEnergyCost = reproductionEnergyCost;
+        this.energyToReproduce = energyToReproduce;
+        this.genes = randomGenes(genesNumber);
+    }
+
+    public Animal(Vector2d position, int energy, int[] genes, int reproductionEnergyCost, int energyToReproduce, int minGeneMutation, int maxGeneMutation) {
+        this.position = position;
+        this.energy = energy;
+        this.orientation = (int)(Math.random() * 8);
+        this.pointer = 0;
+        this.reproductionEnergyCost = reproductionEnergyCost;
+        this.energyToReproduce = energyToReproduce;
+        this.genes = genes;
+        this.minGeneMutation = minGeneMutation;
+        this.maxGeneMutation = maxGeneMutation;
+    }
+
+    private int[] randomGenes(int n){
+        int[] genes = new int[n];
+        for(int i = 0; i < n; i++){
+            genes[i] = (int)(Math.random() * 8);
+        }
+        return genes;
+    }
 
     public int getOrientation() {
         return orientation;
@@ -18,6 +61,31 @@ public class Animal implements WorldElement {
 
     public void setPosition(Vector2d position) {
         this.position = position;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public int getChilds() {
+        return childs;
+    }
+
+    public int getOffspring() {
+        return offspring;
+    }
+
+    public void setParents(Animal parent1, Animal parent2) {
+        this.parents.add(parent1);
+        this.parents.add(parent2);
+    }
+
+    public void updateOffspring() {
+        offspring++;
+        if (!parents.isEmpty()) {
+            parents.get(0).updateOffspring();
+            parents.get(1).updateOffspring();
+        }
     }
 
     public Vector2d getNextMove() {
@@ -38,11 +106,21 @@ public class Animal implements WorldElement {
         return String.valueOf(energy);
     }
 
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void die() {
+        this.alive = false;
+        this.death = this.age;
+    }
+
     public void move(MoveValidator validator) {
         this.position = getNextMove();
         this.orientation = getNextOrientation();
         pointer = (pointer + 1) % genes.length;
         energy--;
+        age++;
     }
 
     public void gainEnergy(int energy) {

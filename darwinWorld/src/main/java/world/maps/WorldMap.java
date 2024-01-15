@@ -24,6 +24,12 @@ public interface WorldMap extends MoveValidator {
 
     void eatGrass(Animal animal);
 
+    void removeDeadAnimal(Animal animal);
+
+    int getGrassesNumber();
+
+    int getFreeSpaceNumber();
+
     /**
      * Moves an animal (if it is present on the map) according to specified direction.
      * If the move is not possible, this method has no effect.
