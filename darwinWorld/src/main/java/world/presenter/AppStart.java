@@ -1,8 +1,9 @@
 package world.presenter;
 
-public class SimulationApp extends AbstractApp {
+public class AppStart extends AbstractApp {
+
     @Override
     protected String getFXMLPath() {
-        return "simulation.fxml";
+        return "start.fxml";
     }
 }
