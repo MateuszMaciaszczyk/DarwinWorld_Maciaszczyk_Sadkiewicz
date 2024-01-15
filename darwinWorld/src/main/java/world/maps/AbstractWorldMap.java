@@ -21,7 +21,6 @@ public abstract class AbstractWorldMap implements WorldMap {
         this.id = UUID.randomUUID();
         this.lowerLeft = new Vector2d(0, 0);
         this.upperRight = new Vector2d(width - 1, height - 1);
-        this.plantsEnergy = plantsEnergy;
         generateGrass(grassNumber);
         this.costOfReproduction = costOfReproduction;
     }
