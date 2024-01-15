@@ -11,6 +11,7 @@ import java.util.Random;
 
 public class Simulation extends Thread{
     private final List<Animal> animals = new ArrayList<>();
+    private final List<Animal> deadAnimals = new ArrayList<>();
     private final WorldMap map;
     private final List<Animal> childs = new ArrayList<>();
     private int energy;
@@ -49,9 +50,39 @@ public class Simulation extends Thread{
         return map.getFreeSpaceNumber();
     }
 
-    public int getAverageEnergy(){  //TODO
+    public int getAverageLifeLength(){
         int sum = 0;
-        return 0;
+        for (Animal deadAnimal : deadAnimals) {
+            sum += deadAnimal.getAge();
+        }
+        return sum / deadAnimals.size();
+    }
+
+    public int getAverageChildrenNumber(){
+        int sum = 0;
+        for (Animal animal : animals) {
+            sum += animal.getChilds();
+        }
+        return sum / animals.size();
+    }
+
+    public List<Integer> getPopularGenes(){ //TODO
+        List<Integer> popularGenes = new ArrayList<>();
+        int[] genes = new int[genesNumber];
+        for (Animal animal : animals) {
+            for (int i = 0; i < genesNumber; i++) {
+                genes[i] = animal.getGenes()[i];
+            }
+        }
+        return popularGenes;
+    }
+
+    public int getAverageEnergy(){
+        int sum = 0;
+        for (Animal animal : animals) {
+            sum += animal.getEnergy();
+        }
+        return sum / animals.size();
     }
 
     private void initializeAnimals(int animalAmount) {
@@ -98,6 +129,7 @@ public class Simulation extends Thread{
         for (int i = 0; i < animals.size(); i++) {
             if (animals.get(i).getEnergy() <= 0) {
                 System.out.println("Zwierzę zginęło!");
+                deadAnimals.add(animals.get(i));
                 map.removeDeadAnimal(animals.get(i));
                 animals.remove(animals.get(i));
             }
