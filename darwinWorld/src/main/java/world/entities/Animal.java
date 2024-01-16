@@ -24,21 +24,10 @@ public class Animal implements WorldElement {
     private int childs = 0;
     private int offspring = 0;
     private int death = 0;
+    private int eatenPlants = 0;
     List<Animal> parents = new ArrayList<>();
 
-    // constructor for initial animals
-    public Animal(Vector2d position, int energy, int genesNumber, int reproductionEnergyCost, int energyToReproduce, String mutationVariant) {
-        this.position = position;
-        this.energy = energy;
-        this.orientation = (int)(Math.random() * 8);
-        this.pointer = 0;
-        this.reproductionEnergyCost = reproductionEnergyCost;
-        this.energyToReproduce = energyToReproduce;
-        this.genes = randomGenes(genesNumber);
-        this.mutationVariant = mutationVariant;
-    }
 
-    // constructor for children
     public Animal(Vector2d position, int energy, int[] genes, int reproductionEnergyCost, int energyToReproduce, int minGeneMutation, int maxGeneMutation, String mutationVariant) {
         this.position = position;
         this.energy = energy;
@@ -50,14 +39,6 @@ public class Animal implements WorldElement {
         this.minGeneMutation = minGeneMutation;
         this.maxGeneMutation = maxGeneMutation;
         this.mutationVariant = mutationVariant;
-    }
-
-    private int[] randomGenes(int n){
-        int[] genes = new int[n];
-        for(int i = 0; i < n; i++){
-            genes[i] = (int)(Math.random() * 8);
-        }
-        return genes;
     }
 
     public int getOrientation() {
@@ -106,11 +87,6 @@ public class Animal implements WorldElement {
         return (orientation + direction) % 8;
     }
 
-    @Override
-    public String toString() {
-        return String.valueOf(energy);
-    }
-
     public int getEnergy() {
         return energy;
     }
@@ -134,11 +110,12 @@ public class Animal implements WorldElement {
 
     public void gainEnergy(int energy) {
         this.energy += energy;
+        eatenPlants++;
     }
 
     public boolean isAt(Vector2d position) { return this.position.equals(position); }
 
-    public Vector2d getPosition() { return position; }
+    public Vector2d position() { return position; }
 
     public int[] getGenes() {
         return genes;
@@ -197,5 +174,13 @@ public class Animal implements WorldElement {
         childGenes[numberOfGene1] = childGenes[numberOfGene2];
         childGenes[numberOfGene2] = temp;
         return childGenes;
+    }
+
+    public int getPointer() {
+        return pointer;
+    }
+
+    public int getEatenPlants() {
+        return eatenPlants;
     }
 }

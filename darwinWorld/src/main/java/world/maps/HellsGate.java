@@ -17,13 +17,8 @@ public class HellsGate extends AbstractWorldMap{
     }
 
     @Override
-    public Boundary getCurrentBounds() {
-        return new Boundary(lowerLeft, upperRight);
-    }
-
-    @Override
     public void move(Animal animal) {
-        Vector2d oldPosition = animal.getPosition();
+        Vector2d oldPosition = animal.position();
         Vector2d newPosition = animal.getNextMove();
 
         if (!canMoveTo(newPosition)) {
@@ -35,7 +30,7 @@ public class HellsGate extends AbstractWorldMap{
         animals.remove(oldPosition);
         animal.move(this);
         animal.setPosition(newPosition);
-        animals.put(animal.getPosition(), animal);
+        animals.put(animal.position(), animal);
 
         mapChanged();
     }

@@ -3,7 +3,6 @@ package world.entities;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import world.entities.Animal;
 import world.basic.Vector2d;
 
 
@@ -76,7 +75,7 @@ public class AnimalTest {
     @Test
     public void testGetPosition() {
         Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
-        assertEquals(position, animal.getPosition(), "Animal's position should be equal to the initial position.");
+        assertEquals(position, animal.position(), "Animal's position should be equal to the initial position.");
     }
 
     @Test

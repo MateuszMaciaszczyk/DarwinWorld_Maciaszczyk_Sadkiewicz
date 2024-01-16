@@ -1,14 +1,18 @@
 package world.presenter;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import world.basic.Vector2d;
 import world.entities.Animal;
+import world.entities.Grass;
 import world.entities.WorldElement;
 import world.maps.Boundary;
 import world.maps.MapChangeListener;
 import world.maps.WorldMap;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +29,7 @@ public class SimulationPresenter implements MapChangeListener {
     private WorldMap worldMap;
     private Simulation simulation;
     private SimulationEngine simulationEngine;
+    private SimulationStatistics stats;
     private int animalsAmount;
     private int spawningPlantsAmount;
     private int animalEnergy;
@@ -35,6 +40,7 @@ public class SimulationPresenter implements MapChangeListener {
     private int maxGeneMutation;
     private int genomeLength;
     private String mutationVariant;
+    private boolean saveStatistics;
 
     public void setWorldMap(WorldMap map) {
         this.worldMap = map;
@@ -67,6 +73,9 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     private Label dayLabel;
 
+    public void setSaveStatistics(boolean saveStatistics) {
+        this.saveStatistics = saveStatistics;
+    }
 
     public void setAnimalsAmount(int amount) {
         this.animalsAmount = amount;
@@ -79,7 +88,6 @@ public class SimulationPresenter implements MapChangeListener {
     public void setAnimalEnergy(int animalEnergy) {
         this.animalEnergy = animalEnergy;
     }
-
 
     public void setReproduceReady(int reproduceReady) {
         this.reproduceReady = reproduceReady;
@@ -140,12 +148,12 @@ public class SimulationPresenter implements MapChangeListener {
 
     private Node createNodeForElement(WorldElement element, boolean hasGrass) {
         Label label = new Label();
-        label.setMinWidth(50);
-        label.setMinHeight(50);
+        label.setMinWidth(20);
+        label.setMinHeight(20);
         label.setAlignment(Pos.CENTER);
 
         if (element != null) {
-            if (element.toString().equals("*")) { // Assuming * represents grass
+            if (element instanceof Grass) { // Assuming * represents grass
                 label.setStyle("-fx-background-color: green;");
             } else { // Assuming this is an animal
                 Animal animal = (Animal) element;
@@ -162,7 +170,7 @@ public class SimulationPresenter implements MapChangeListener {
                 }
 
                 Circle circle = new Circle();
-                circle.setRadius(15); // Set the radius to half of the cell size
+                circle.setRadius(5); // Set the radius to half of the cell size
                 circle.setFill(color); // Set the color to the calculated color
                 label.setGraphic(circle);
                 if (hasGrass) {
@@ -187,14 +195,34 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     private void updateStatistics() {
-        dayLabel.setText("Day: " + simulation.getDay());
-        animalCountLabel.setText("Animal count: " + simulation.getAnimalAmount());
-        grassCountLabel.setText("Grass count: " + simulation.getGrassAmount());
-        freeSpaceCountLabel.setText("Free space count: " + simulation.getFreeSpace());
-        mostPopularGeneLabel.setText("Most popular gene: " + Arrays.toString(simulation.getPopularGenes()));
-        averageEnergyLabel.setText("Average energy: " + simulation.getAverageEnergy());
-        averageLifeLengthLabel.setText("Average life length: " + simulation.getAverageLifeLength());
-        averageChildrenCountLabel.setText("Average children count: " + simulation.getAverageChildrenNumber());
+        stats.updateStatistics(simulation, worldMap, simulation.getAnimals(), simulation.getDeadAnimals(), simulation.getChilds());
+        dayLabel.setText("Day: " + stats.getDay());
+        animalCountLabel.setText("Animal count: " + stats.getAnimalAmount());
+        grassCountLabel.setText("Grass count: " + stats.getGrassAmount());
+        freeSpaceCountLabel.setText("Free space count: " + stats.getFreeSpace());
+        mostPopularGeneLabel.setText("Most popular gene: " + Arrays.toString(stats.getPopularGenes()));
+        averageEnergyLabel.setText("Average energy: " + stats.getAverageEnergy());
+        averageLifeLengthLabel.setText("Average life length: " + stats.getAverageLifeLength());
+        averageChildrenCountLabel.setText("Average children count: " + stats.getAverageChildrenNumber());
+
+        if (saveStatistics) {
+            saveStatisticsToCSV();
+        }
+    }
+
+    private void saveStatisticsToCSV() {
+        try (FileWriter writer = new FileWriter("statistics.csv", true)) {
+            writer.append(stats.getDay() + ",");
+            writer.append(stats.getAnimalAmount() + ",");
+            writer.append(stats.getGrassAmount() + ",");
+            writer.append(stats.getFreeSpace() + ",");
+            writer.append(Arrays.toString(stats.getPopularGenes()) + ",");
+            writer.append(stats.getAverageEnergy() + ",");
+            writer.append(stats.getAverageLifeLength() + ",");
+            writer.append(stats.getAverageChildrenNumber() + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -204,6 +232,7 @@ public class SimulationPresenter implements MapChangeListener {
                 this.simulation = new Simulation(animalsAmount, worldMap, animalEnergy, genomeLength, reproduceReady, reproduceEnergyCost, minGeneMutation, maxGeneMutation, spawningPlantsAmount, mutationVariant);
                 simulationEngine = new SimulationEngine(new ArrayList<>());
                 simulationEngine.getSimulations().add(simulation);
+                stats = new SimulationStatistics(simulation, worldMap, simulation.getAnimals(), simulation.getDeadAnimals(), simulation.getChilds());
                 simulationEngine.runAsync();
                 startStopButton.setText("Stop");
             }
