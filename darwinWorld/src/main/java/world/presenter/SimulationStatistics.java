@@ -1,9 +1,15 @@
 package world.presenter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import world.entities.Animal;
+import world.maps.WorldMap;
 
 public class SimulationStatistics {
-    private final Simulation simulation;
+    private Simulation simulation;
     private int day = 0;
     private int animalAmount = 0;
     private int grassAmount = 0;
@@ -12,16 +18,24 @@ public class SimulationStatistics {
     private int averageLifeLength = 0;
     private double averageChildrenNumber = 0.0;
     private int[] popularGenes;
+    private List<Animal> animals = new ArrayList<>();
+    private List<Animal> deadAnimals = new ArrayList<>();
+    private WorldMap map;
+    private List<Animal> childs = new ArrayList<>();
 
-    public SimulationStatistics(Simulation simulation) {
+    public SimulationStatistics(Simulation simulation, WorldMap map, List<Animal> animals, List<Animal> deadAnimals, List<Animal> childs) {
+        this.animals = animals;
+        this.deadAnimals = deadAnimals;
+        this.childs = childs;
         this.simulation = simulation;
-        this.animalAmount = simulation.getAnimalAmount();
-        this.grassAmount = simulation.getGrassAmount();
-        this.freeSpace = simulation.getFreeSpace();
-        this.averageEnergy = simulation.getAverageEnergy();
-        this.averageLifeLength = simulation.getAverageLifeLength();
-        this.averageChildrenNumber = simulation.getAverageChildrenNumber();
-        this.popularGenes = simulation.getPopularGenes();
+        this.map = map;
+        this.animalAmount = animals.size();
+        this.grassAmount = map.getGrassesNumber();
+        this.freeSpace = map.getFreeSpaceNumber();
+        this.averageEnergy = getAverageLifeLength();
+        this.averageLifeLength = getAverageLifeLength();
+        this.averageChildrenNumber = getAverageChildrenNumber();
+        this.popularGenes = getPopularGenes();
     }
 
     public void updateStatistics(Simulation simulation, WorldMap map, List<Animal> animals, List<Animal> deadAnimals, List<Animal> childs){

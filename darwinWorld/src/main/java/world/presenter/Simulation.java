@@ -14,11 +14,10 @@ public class Simulation extends Thread{
     private final List<Animal> animals = new ArrayList<>();
     private final List<Animal> deadAnimals = new ArrayList<>();
     private final WorldMap map;
+    private final SimulationStatistics stats;
     private final List<Animal> childs = new ArrayList<>();
     private int energy;
     private int genesNumber;
-    private int animalAmount;
-    private int grassAmount;
     private int energyToReproduce;
     private int costOfReproduction;
     private int minGeneMutation;
@@ -39,6 +38,7 @@ public class Simulation extends Thread{
         this.numberOfSpawningPlants = numberOfSpawningPlants;
         this.mutationVariant = mutationVariant;
         initializeAnimals(animalAmount);
+        this.stats = new SimulationStatistics(this, map, animals, deadAnimals, childs);
     }
 
     private void initializeAnimals(int animalAmount) {
@@ -103,66 +103,41 @@ public class Simulation extends Thread{
         }
     }
 
-    private List<Animal> getTwoStrongestAnimals(Animal animal1, Animal animal2) {
-        Animal strongest1 = animal1;
-        Vector2d position = animal1.getPosition();
-        for (int i = 1; i < animals.size(); i++) {
-            if (animals.get(i).getPosition().equals(position) && animals.get(i) != animal1) {
-                if (animals.get(i).getEnergy() == strongest1.getEnergy()) {
-                    if (animals.get(i).getAge() == strongest1.getAge()) {
-                        if (animals.get(i).getChilds() == strongest1.getChilds()) {
-                            if (Math.random() <= 0.5) {
-                                strongest1 = animals.get(i);
-                            }
-                        }
+    public Animal findStrongestAnimal(Vector2d position, Animal excludeAnimal) {
+        Animal strongest = null;
 
-                        if (animals.get(i).getChilds() > strongest1.getChilds()) {
-                            strongest1 = animals.get(i);
-                        }
-                    }
-
-                    if (animals.get(i).getAge() > strongest1.getAge()) {
-                        strongest1 = animals.get(i);
-                    }
-                }
-                if (animals.get(i).getEnergy() > strongest1.getEnergy()) {
-                    strongest1= animals.get(i);
-                }
-            }
-
-        }
-
-        Animal strongest2 = animal2;
-
-        for (int i = 1; i < animals.size(); i++) {
-            if (animals.get(i).getPosition().equals(position) && animals.get(i) != animal1 && animals.get(i) != strongest1) {
-                if (animals.get(i).getEnergy() == strongest2.getEnergy()) {
-                    if (animals.get(i).getAge() == strongest2.getAge()) {
-                        if (animals.get(i).getChilds() == strongest2.getChilds()) {
-                            if (Math.random() <= 0.5) {
-                                strongest2 = animals.get(i);
-                            }
-                        }
-
-                        if (animals.get(i).getChilds() > strongest2.getChilds()) {
-                            strongest2 = animals.get(i);
-                        }
-                    }
-
-                    if (animals.get(i).getAge() > strongest2.getAge()) {
-                        strongest2 = animals.get(i);
-                    }
-                }
-                if (animals.get(i).getEnergy() > strongest2.getEnergy()) {
-                    strongest2= animals.get(i);
+        for (Animal animal : animals) {
+            if (animal.position().equals(position) && animal != excludeAnimal) {
+                if (strongest == null ||
+                        animal.getEnergy() > strongest.getEnergy() ||
+                        (animal.getEnergy() == strongest.getEnergy() && (
+                                animal.getAge() > strongest.getAge() ||
+                                        (animal.getAge() == strongest.getAge() && animal.getChilds() > strongest.getChilds()) ||
+                                        (animal.getAge() == strongest.getAge() && animal.getChilds() == strongest.getChilds() && Math.random() <= 0.5)
+                        ))) {
+                    strongest = animal;
                 }
             }
         }
+
+        return strongest;
+    }
+
+    public List<Animal> getTwoStrongestAnimals(Animal animal1) {
+        Vector2d position = animal1.position();
+        Animal strongest1 = findStrongestAnimal(position, animal1);
+        Animal strongest2 = findStrongestAnimal(position, strongest1);
+
         List<Animal> strongestAnimals = new ArrayList<>();
-        strongestAnimals.add(strongest1);
-        strongestAnimals.add(strongest2);
+        if (strongest1 != null) {
+            strongestAnimals.add(strongest1);
+        }
+        if (strongest2 != null && strongest2 != strongest1) {
+            strongestAnimals.add(strongest2);
+        }
         return strongestAnimals;
     }
+
 
     public int getDay() {
         return day;
@@ -226,6 +201,7 @@ public class Simulation extends Thread{
                     }
                 }
                 Thread.sleep(500);
+                stats.updateStatistics(this, map, animals, deadAnimals, childs);
                 removeDeadAnimals();
                 moveAnimals();
                 eatGrass();
