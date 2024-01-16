@@ -63,4 +63,6 @@ public interface WorldMap extends MoveValidator {
     UUID getId();
 
     void placePlants();
+
+    boolean hasGrassAt(Vector2d position);
 }

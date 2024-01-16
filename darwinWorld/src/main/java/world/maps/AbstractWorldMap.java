@@ -21,6 +21,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         this.id = UUID.randomUUID();
         this.lowerLeft = new Vector2d(0, 0);
         this.upperRight = new Vector2d(width - 1, height - 1);
+        this.plantsEnergy = plantsEnergy;
         generateGrass(grassNumber);
         this.costOfReproduction = costOfReproduction;
     }
@@ -38,11 +39,12 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     @Override
     public int getFreeSpaceNumber() {
-        int freeSpaceNumber = 0;
+        int freeSpaceNumber = upperRight.getX() * upperRight.getY();
         for (int i = 0; i < upperRight.getX(); i++) {
-            for (int j = 0; j < lowerLeft.getY(); j++) {
-                if (!isOccupied(new Vector2d(i, j))) {
-                    freeSpaceNumber++;
+            for (int j = 0; j < upperRight.getY(); j++) {
+                Vector2d position = new Vector2d(i, j);
+                if (plants.containsKey(position)) {
+                    freeSpaceNumber--;
                 }
             }
         }
@@ -52,15 +54,19 @@ public abstract class AbstractWorldMap implements WorldMap {
     @Override
     public void place(Animal animal){
         animals.put(animal.getPosition(), animal);
-        mapChanged("Animal placed at: " + animal.getPosition());
+        mapChanged();
     }
 
     public void placePlants() {
+        if (getFreeSpaceNumber() == 0) {
+            return;
+        }
         Vector2d grassPosition = getPreferredPosition();
         while (plants.containsKey(grassPosition)) {
             grassPosition = getPreferredPosition();
         }
         plants.put(grassPosition, new Grass(grassPosition, plantsEnergy));
+        mapChanged();
     }
 
     @Override
@@ -69,13 +75,13 @@ public abstract class AbstractWorldMap implements WorldMap {
         if (plants.containsKey(position)) {
             animal.gainEnergy(plants.get(position).getEnergy());
             plants.remove(position);
-            mapChanged("Animal ate grass at: " + position);
+            mapChanged();
         }
     }
 
     @Override
     public boolean isOccupied(Vector2d position) {
-        return animals.containsKey(position) || plants.containsKey(position);
+        return animals.containsKey(position);
     }
 
     @Override
@@ -100,9 +106,9 @@ public abstract class AbstractWorldMap implements WorldMap {
         mapChangeListeners.remove(listener);
     }
 
-    public synchronized void mapChanged(String message) {
+    public synchronized void mapChanged() {
         for (MapChangeListener listener : mapChangeListeners) {
-            listener.mapChanged(this, message);
+            listener.mapChanged(this);
         }
     }
 
@@ -114,7 +120,6 @@ public abstract class AbstractWorldMap implements WorldMap {
         int preferredHeight = (upperRight.getY() - lowerLeft.getY() + 1) / 5; // 20% of the map height
         int preferredLowerY = lowerLeft.getY() + 2 * preferredHeight;
         int preferredUpperY = upperRight.getY() - 2 * preferredHeight;
-
         double chance = Math.random();
         int x, y;
 
@@ -142,5 +147,10 @@ public abstract class AbstractWorldMap implements WorldMap {
     public void removeDeadAnimal(Animal animal) {
         animals.remove(animal.getPosition());
         animal.die();
+        mapChanged();
+    }
+
+    public boolean hasGrassAt(Vector2d position) {
+        return plants.containsKey(position);
     }
 }

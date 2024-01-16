@@ -20,13 +20,13 @@ public class AnimalTest {
 
     @Test
     public void testCanBreed() {
-        Animal animal = new Animal(position, 60, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, 60, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         assertTrue(animal.canBreed(), "Animal should be able to breed when energy is equal or greater than energyToReproduce.");
     }
 
     @Test
     public void testGetNextOrientation() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         animal.iteratePointer();
         int nextOrientation = animal.getNextOrientation();
         assertTrue(nextOrientation >= 0 && nextOrientation < 8, "Orientation should be within range 0 to 7.");
@@ -34,36 +34,36 @@ public class AnimalTest {
 
     @Test
     public void testGetEnergy() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         assertEquals(energy, animal.getEnergy(), "Energy should be equal to the initial energy.");
     }
 
     @Test
     public void testGainEnergy() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         animal.gainEnergy(20);
         assertEquals(70, animal.getEnergy(), "Energy should increase by the amount gained.");
     }
 
     @Test
     public void testIsAt() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         assertTrue(animal.isAt(position), "Animal should be at the given position.");
         assertFalse(animal.isAt(new Vector2d(4, 5)), "Animal should not be at a different position.");
     }
 
     @Test
     public void testDie() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         animal.die();
         assertFalse(animal.isAlive(), "Animal should be marked as not alive after die() is called.");
     }
 
     @Test
     public void testUpdateOffspring() {
-        Animal parent1 = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
-        Animal parent2 = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
-        Animal child = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal parent1 = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
+        Animal parent2 = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
+        Animal child = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
 
         child.setParents(parent1, parent2);
         child.updateOffspring();
@@ -75,20 +75,20 @@ public class AnimalTest {
 
     @Test
     public void testGetPosition() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         assertEquals(position, animal.getPosition(), "Animal's position should be equal to the initial position.");
     }
 
     @Test
     public void testUpdateChilds() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         animal.updateChilds();
         assertEquals(1, animal.getChilds(), "Number of children should be incremented after updateChilds() is called.");
     }
 
     @Test
     public void testDecreaseEnergy() {
-        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         animal.decreaseEnergy(10);
         assertEquals(40, animal.getEnergy(), "Energy should decrease by the specified amount.");
     }
@@ -97,8 +97,8 @@ public class AnimalTest {
     public void testBreedGenesInheritance() {
         int parent1Energy = 80;
         int parent2Energy = 120;
-        Animal parent1 = new Animal(position, parent1Energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
-        Animal parent2 = new Animal(position, parent2Energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2);
+        Animal parent1 = new Animal(position, parent1Energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
+        Animal parent2 = new Animal(position, parent2Energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
 
         Animal child = parent1.breed(parent2);
         int[] childGenes = child.getGenes();

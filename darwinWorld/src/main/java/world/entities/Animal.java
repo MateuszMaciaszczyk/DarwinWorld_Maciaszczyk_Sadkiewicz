@@ -18,6 +18,7 @@ public class Animal implements WorldElement {
     private int energyToReproduce;
     private int minGeneMutation;
     private int maxGeneMutation;
+    private String mutationVariant;
     private boolean alive = true;
     private int age = 0;
     private int childs = 0;
@@ -25,7 +26,8 @@ public class Animal implements WorldElement {
     private int death = 0;
     List<Animal> parents = new ArrayList<>();
 
-    public Animal(Vector2d position, int energy, int genesNumber, int reproductionEnergyCost, int energyToReproduce ) {
+    // constructor for initial animals
+    public Animal(Vector2d position, int energy, int genesNumber, int reproductionEnergyCost, int energyToReproduce, String mutationVariant) {
         this.position = position;
         this.energy = energy;
         this.orientation = (int)(Math.random() * 8);
@@ -33,18 +35,21 @@ public class Animal implements WorldElement {
         this.reproductionEnergyCost = reproductionEnergyCost;
         this.energyToReproduce = energyToReproduce;
         this.genes = randomGenes(genesNumber);
+        this.mutationVariant = mutationVariant;
     }
 
-    public Animal(Vector2d position, int energy, int[] genes, int reproductionEnergyCost, int energyToReproduce, int minGeneMutation, int maxGeneMutation) {
+    // constructor for children
+    public Animal(Vector2d position, int energy, int[] genes, int reproductionEnergyCost, int energyToReproduce, int minGeneMutation, int maxGeneMutation, String mutationVariant) {
         this.position = position;
         this.energy = energy;
         this.orientation = (int)(Math.random() * 8);
-        this.pointer = 0;
+        this.pointer = (int)(Math.random() * genes.length);
         this.reproductionEnergyCost = reproductionEnergyCost;
         this.energyToReproduce = energyToReproduce;
         this.genes = genes;
         this.minGeneMutation = minGeneMutation;
         this.maxGeneMutation = maxGeneMutation;
+        this.mutationVariant = mutationVariant;
     }
 
     private int[] randomGenes(int n){
@@ -162,11 +167,12 @@ public class Animal implements WorldElement {
         System.arraycopy(parent1Genes, 0, childGenes, 0, cutoff);
         System.arraycopy(parent2Genes, cutoff, childGenes, cutoff, parent1Genes.length - cutoff);
 
-        // Mutate some genes
-        childGenes = randomGenes(childGenes);
-        //childGenes = swapGenes(childGenes);
+        if (mutationVariant.equals("Random Mutation"))
+            childGenes = randomGenes(childGenes);
+        else
+            childGenes = swapGenes(childGenes);
 
-        return new Animal(new Vector2d(0, 0), childEnergy, childGenes, reproductionEnergyCost, energyToReproduce, minGeneMutation, maxGeneMutation);
+        return new Animal(new Vector2d(0, 0), childEnergy, childGenes, reproductionEnergyCost, energyToReproduce, minGeneMutation, maxGeneMutation, mutationVariant);
     }
 
     public void decreaseEnergy(int n) {

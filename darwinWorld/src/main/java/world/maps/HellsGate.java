@@ -37,7 +37,7 @@ public class HellsGate extends AbstractWorldMap{
         animal.setPosition(newPosition);
         animals.put(animal.getPosition(), animal);
 
-        mapChanged("Animal moved from: " + oldPosition + " to: " + newPosition);
+        mapChanged();
     }
 
     private Vector2d getRandomPosition() {
