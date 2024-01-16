@@ -51,6 +51,8 @@
 
                 <Label text="Mutation Variant:" GridPane.columnIndex="0" GridPane.rowIndex="13"/>
                 <ChoiceBox fx:id="MutationVariant" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+
+                <CheckBox fx:id="generateCsvCheckBox" text="Save Statistics" GridPane.columnIndex="1" GridPane.rowIndex="14" />
             </GridPane>
 
             <VBox spacing="10">

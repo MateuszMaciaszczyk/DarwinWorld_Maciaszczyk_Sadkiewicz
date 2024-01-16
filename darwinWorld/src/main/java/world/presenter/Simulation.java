@@ -14,11 +14,10 @@ public class Simulation extends Thread{
     private final List<Animal> animals = new ArrayList<>();
     private final List<Animal> deadAnimals = new ArrayList<>();
     private final WorldMap map;
+    private final SimulationStatistics stats;
     private final List<Animal> childs = new ArrayList<>();
     private int energy;
     private int genesNumber;
-    private int animalAmount;
-    private int grassAmount;
     private int energyToReproduce;
     private int costOfReproduction;
     private int minGeneMutation;
@@ -39,70 +38,7 @@ public class Simulation extends Thread{
         this.numberOfSpawningPlants = numberOfSpawningPlants;
         this.mutationVariant = mutationVariant;
         initializeAnimals(animalAmount);
-    }
-
-    public int getAnimalAmount() {
-        this.animalAmount = animals.size();
-        return animalAmount;
-    }
-
-    public int getGrassAmount() {
-        this.grassAmount = map.getGrassesNumber();
-        return grassAmount;
-    }
-
-    public int getFreeSpace() {
-        return map.getFreeSpaceNumber();
-    }
-
-    public int getAverageLifeLength(){
-        int sum = 0;
-        for (Animal deadAnimal : deadAnimals) {
-            sum += deadAnimal.getAge();
-        }
-        if (deadAnimals.isEmpty()) {
-            return 0;
-        }
-        else return sum / deadAnimals.size();
-    }
-
-    public int getAverageChildrenNumber(){
-        int sum = 0;
-        for (Animal animal : animals) {
-            sum += animal.getChilds();
-        }
-        return sum / animals.size();
-    }
-
-    public int[] getPopularGenes(){
-        Map<int[], Integer> genotypeFrequency = new HashMap<>();
-
-        for (Animal animal : animals) {
-            int[] genes = animal.getGenes();
-            genotypeFrequency.put(genes, genotypeFrequency.getOrDefault(genes, 0) + 1);
-        }
-
-        int[] mostPopularGenotype = new int[0];
-        int maxFrequency = 0;
-        for (Map.Entry<int[], Integer> entry : genotypeFrequency.entrySet()) {
-            if (entry.getValue() > maxFrequency) {
-                maxFrequency = entry.getValue();
-                mostPopularGenotype = entry.getKey();
-            }
-        }
-
-        return mostPopularGenotype;
-    }
-
-    public int getAverageEnergy(){
-        int sum = 0;
-        for (Animal animal : animals) {
-            sum += animal.getEnergy();
-        }
-        if (animals.isEmpty()) {
-            return 0;
-        }
-        else return sum / animals.size();
+        this.stats = new SimulationStatistics(this, map, animals, deadAnimals, childs);
     }
 
     private void initializeAnimals(int animalAmount) {
@@ -112,10 +48,18 @@ public class Simulation extends Thread{
             int x = random.nextInt(worldBoundary.upperRight().getX());
             int y = random.nextInt(worldBoundary.upperRight().getY());
             Vector2d randomPosition = new Vector2d(x, y);
-            Animal animal = new Animal(randomPosition, energy, genesNumber, energyToReproduce, costOfReproduction, mutationVariant);
+            Animal animal = new Animal(randomPosition, energy, randomGenes(genesNumber), energyToReproduce, costOfReproduction, minGeneMutation, maxGeneMutation, mutationVariant);
             map.place(animal);
             animals.add(animal);
         }
+    }
+
+    private int[] randomGenes(int n){
+        int[] genes = new int[n];
+        for(int i = 0; i < n; i++){
+            genes[i] = (int)(Math.random() * 8);
+        }
+        return genes;
     }
 
     private void breedAnimals() {
@@ -124,9 +68,9 @@ public class Simulation extends Thread{
         for (int i = 0; i < animals.size(); i++) {
             if (animals.get(i).canBreed()) {
                 for (int j = i + 1; j < animals.size(); j++) {
-                    if (animals.get(j).canBreed() && animals.get(i).getPosition().equals(animals.get(j).getPosition()) && !positionsReserved.contains(animals.get(i).getPosition())) {
-                        List<Animal> strongestAnimals = getTwoStrongestAnimals(animals.get(j), animals.get(i));
-                        positionsReserved.add(strongestAnimals.get(0).getPosition());
+                    if (animals.get(j).canBreed() && animals.get(i).position().equals(animals.get(j).position()) && !positionsReserved.contains(animals.get(i).position())) {
+                        List<Animal> strongestAnimals = getTwoStrongestAnimals(animals.get(j));
+                        positionsReserved.add(strongestAnimals.get(0).position());
                         System.out.println("Nastąpiło rozmnożenie!");
                         Animal parent1 = strongestAnimals.get(0);
                         Animal parent2 = strongestAnimals.get(1);
@@ -153,68 +97,47 @@ public class Simulation extends Thread{
                 animals.remove(animals.get(i));
             }
         }
+        if (animals.isEmpty()) {
+            System.out.println("Wszystkie zwierzęta zginęły!");
+            pauseSimulation();
+        }
     }
 
-    private List<Animal> getTwoStrongestAnimals(Animal animal1, Animal animal2) {
-        Animal strongest1 = animal1;
-        Vector2d position = animal1.getPosition();
-        for (int i = 1; i < animals.size(); i++) {
-            if (animals.get(i).getPosition().equals(position) && animals.get(i) != animal1) {
-                if (animals.get(i).getEnergy() == strongest1.getEnergy()) {
-                    if (animals.get(i).getAge() == strongest1.getAge()) {
-                        if (animals.get(i).getChilds() == strongest1.getChilds()) {
-                            if (Math.random() <= 0.5) {
-                                strongest1 = animals.get(i);
-                            }
-                        }
+    public Animal findStrongestAnimal(Vector2d position, Animal excludeAnimal) {
+        Animal strongest = null;
 
-                        if (animals.get(i).getChilds() > strongest1.getChilds()) {
-                            strongest1 = animals.get(i);
-                        }
-                    }
-
-                    if (animals.get(i).getAge() > strongest1.getAge()) {
-                        strongest1 = animals.get(i);
-                    }
-                }
-                if (animals.get(i).getEnergy() > strongest1.getEnergy()) {
-                    strongest1= animals.get(i);
-                }
-            }
-
-        }
-
-        Animal strongest2 = animal2;
-
-        for (int i = 1; i < animals.size(); i++) {
-            if (animals.get(i).getPosition().equals(position) && animals.get(i) != animal1 && animals.get(i) != strongest1) {
-                if (animals.get(i).getEnergy() == strongest2.getEnergy()) {
-                    if (animals.get(i).getAge() == strongest2.getAge()) {
-                        if (animals.get(i).getChilds() == strongest2.getChilds()) {
-                            if (Math.random() <= 0.5) {
-                                strongest2 = animals.get(i);
-                            }
-                        }
-
-                        if (animals.get(i).getChilds() > strongest2.getChilds()) {
-                            strongest2 = animals.get(i);
-                        }
-                    }
-
-                    if (animals.get(i).getAge() > strongest2.getAge()) {
-                        strongest2 = animals.get(i);
-                    }
-                }
-                if (animals.get(i).getEnergy() > strongest2.getEnergy()) {
-                    strongest2= animals.get(i);
+        for (Animal animal : animals) {
+            if (animal.position().equals(position) && animal != excludeAnimal) {
+                if (strongest == null ||
+                        animal.getEnergy() > strongest.getEnergy() ||
+                        (animal.getEnergy() == strongest.getEnergy() && (
+                                animal.getAge() > strongest.getAge() ||
+                                        (animal.getAge() == strongest.getAge() && animal.getChilds() > strongest.getChilds()) ||
+                                        (animal.getAge() == strongest.getAge() && animal.getChilds() == strongest.getChilds() && Math.random() <= 0.5)
+                        ))) {
+                    strongest = animal;
                 }
             }
         }
+
+        return strongest;
+    }
+
+    public List<Animal> getTwoStrongestAnimals(Animal animal1) {
+        Vector2d position = animal1.position();
+        Animal strongest1 = findStrongestAnimal(position, animal1);
+        Animal strongest2 = findStrongestAnimal(position, strongest1);
+
         List<Animal> strongestAnimals = new ArrayList<>();
-        strongestAnimals.add(strongest1);
-        strongestAnimals.add(strongest2);
+        if (strongest1 != null) {
+            strongestAnimals.add(strongest1);
+        }
+        if (strongest2 != null && strongest2 != strongest1) {
+            strongestAnimals.add(strongest2);
+        }
         return strongestAnimals;
     }
+
 
     public int getDay() {
         return day;
@@ -244,31 +167,6 @@ public class Simulation extends Thread{
         }
     }
 
-    public void run() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                synchronized (this) {
-                    while (!running) {
-                            this.wait();
-                    }
-                }
-                Thread.sleep(500);
-                removeDeadAnimals();
-                moveAnimals();
-                eatGrass();
-                breedAnimals();
-                generateGrass();
-                day++;
-
-                if (animals.isEmpty()) {
-                    System.out.println("All animals are dead. Ending simulation.");
-                    break;
-                }
-            }
-    }catch (InterruptedException e) {
-            throw new RuntimeException(e);}
-}
-
     public List<Animal> getAnimals() { return animals; }
 
     public boolean isRunning() {
@@ -284,5 +182,39 @@ public class Simulation extends Thread{
         synchronized (this) {
             this.notify();
         }
+    }
+
+    public List<Animal> getDeadAnimals() {
+        return deadAnimals;
+    }
+
+    public List<Animal> getChilds() {
+        return childs;
+    }
+
+    public void run() {
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                synchronized (this) {
+                    while (!running) {
+                            this.wait();
+                    }
+                }
+                Thread.sleep(500);
+                stats.updateStatistics(this, map, animals, deadAnimals, childs);
+                removeDeadAnimals();
+                moveAnimals();
+                eatGrass();
+                breedAnimals();
+                generateGrass();
+                day++;
+
+                if (animals.isEmpty()) {
+                    System.out.println("All animals are dead. Ending simulation.");
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+                throw new RuntimeException(e);}
     }
 }

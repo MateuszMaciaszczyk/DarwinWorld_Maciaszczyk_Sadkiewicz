@@ -3,8 +3,6 @@ package world.maps;
 import world.basic.Vector2d;
 import world.entities.Animal;
 
-import java.util.*;
-
 public class Globe extends AbstractWorldMap{
     public Globe(int width, int height, int grassNumber, int costOfReproduction, int plantsEnergy) {
         super(width, height, grassNumber, costOfReproduction, plantsEnergy);
@@ -16,14 +14,9 @@ public class Globe extends AbstractWorldMap{
     }
 
     @Override
-    public Boundary getCurrentBounds() {
-        return new Boundary(lowerLeft, upperRight);
-    }
-
-    @Override
     public void move(Animal animal) {
         System.out.println(animals);
-        Vector2d oldPosition = animal.getPosition();
+        Vector2d oldPosition = animal.position();
         Vector2d newPosition = animal.getNextMove();
         if(!canMoveTo(newPosition)) {
             animal.iteratePointer();
@@ -32,13 +25,13 @@ public class Globe extends AbstractWorldMap{
             animal.move(this);
             animals.remove(oldPosition);
             animal.setPosition(new Vector2d(upperRight.getX(), newPosition.getY()));
-            animals.put(animal.getPosition(), animal);
+            animals.put(animal.position(), animal);
         }
         else if (newPosition.getX() > upperRight.getX()) {
             animal.move(this);
             animals.remove(oldPosition);
             animal.setPosition(new Vector2d(lowerLeft.getX(), newPosition.getY()));
-            animals.put(animal.getPosition(), animal);
+            animals.put(animal.position(), animal);
         }
         else {
             animal.move(this);

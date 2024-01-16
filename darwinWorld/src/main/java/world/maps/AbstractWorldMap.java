@@ -53,7 +53,7 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     @Override
     public void place(Animal animal){
-        animals.put(animal.getPosition(), animal);
+        animals.put(animal.position(), animal);
         mapChanged();
     }
 
@@ -65,15 +65,15 @@ public abstract class AbstractWorldMap implements WorldMap {
         while (plants.containsKey(grassPosition)) {
             grassPosition = getPreferredPosition();
         }
-        plants.put(grassPosition, new Grass(grassPosition, plantsEnergy));
+        plants.put(grassPosition, new Grass(grassPosition));
         mapChanged();
     }
 
     @Override
     public void eatGrass(Animal animal) {
-        Vector2d position = animal.getPosition();
+        Vector2d position = animal.position();
         if (plants.containsKey(position)) {
-            animal.gainEnergy(plants.get(position).getEnergy());
+            animal.gainEnergy(plantsEnergy);
             plants.remove(position);
             mapChanged();
         }
@@ -96,14 +96,12 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     public Set<WorldElement> getElements() { return new HashSet<>(animals.values()); }
 
-    public abstract Boundary getCurrentBounds();
+    public Boundary getCurrentBounds() {
+        return new Boundary(lowerLeft, upperRight);
+    }
 
     public void addMapChangeListener(MapChangeListener listener) {
         mapChangeListeners.add(listener);
-    }
-
-    public void removeMapChangeListener(MapChangeListener listener) {
-        mapChangeListeners.remove(listener);
     }
 
     public synchronized void mapChanged() {
@@ -145,7 +143,7 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     @Override
     public void removeDeadAnimal(Animal animal) {
-        animals.remove(animal.getPosition());
+        animals.remove(animal.position());
         animal.die();
         mapChanged();
     }

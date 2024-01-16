@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -45,6 +46,8 @@ public class StartPresenter {
     private ChoiceBox MutationVariant;
     @FXML
     private Button startButton;
+    @FXML
+    private CheckBox generateCsvCheckBox;
 
     @FXML
     public void initialize() {
@@ -128,6 +131,7 @@ public class StartPresenter {
             int minGeneMutation = parseTextFieldToInt(this.minGeneMutation);
             int maxGeneMutation = parseTextFieldToInt(this.maxGeneMutation);
             int genomeLength = parseTextFieldToInt(this.genomeLength);
+            boolean saveStatistics = generateCsvCheckBox.isSelected();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/simulation.fxml"));
             Parent root = loader.load();
@@ -153,6 +157,7 @@ public class StartPresenter {
             simulationPresenter.setMaxGeneMutation(maxGeneMutation);
             simulationPresenter.setGenomeLength(genomeLength);
             simulationPresenter.setMutationVariant(mutationVariant);
+            simulationPresenter.setSaveStatistics(saveStatistics);
             simulationPresenter.onStartStopClicked();
 
             Stage simulationStage = new Stage();
