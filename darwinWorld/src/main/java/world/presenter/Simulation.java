@@ -77,13 +77,11 @@ public class Simulation extends Thread{
     public int[] getPopularGenes(){
         Map<int[], Integer> genotypeFrequency = new HashMap<>();
 
-        // Zliczanie wystąpień każdego genotypu
         for (Animal animal : animals) {
             int[] genes = animal.getGenes();
             genotypeFrequency.put(genes, genotypeFrequency.getOrDefault(genes, 0) + 1);
         }
 
-        // Znajdowanie najczęściej występującego genotypu
         int[] mostPopularGenotype = new int[0];
         int maxFrequency = 0;
         for (Map.Entry<int[], Integer> entry : genotypeFrequency.entrySet()) {
@@ -101,7 +99,10 @@ public class Simulation extends Thread{
         for (Animal animal : animals) {
             sum += animal.getEnergy();
         }
-        return sum / animals.size();
+        if (animals.isEmpty()) {
+            return 0;
+        }
+        else return sum / animals.size();
     }
 
     private void initializeAnimals(int animalAmount) {
@@ -210,8 +211,8 @@ public class Simulation extends Thread{
             }
         }
         List<Animal> strongestAnimals = new ArrayList<>();
-        animals.add(strongest1);
-        animals.add(strongest2);
+        strongestAnimals.add(strongest1);
+        strongestAnimals.add(strongest2);
         return strongestAnimals;
     }
 
@@ -220,6 +221,9 @@ public class Simulation extends Thread{
     }
 
     private void generateGrass() {
+        if (map.getFreeSpaceNumber() == 0) {
+            return;
+        }
         for (int i = 0; i < numberOfSpawningPlants; i++) {
             if (map.getFreeSpaceNumber() == 0) {
                 return;
@@ -248,7 +252,7 @@ public class Simulation extends Thread{
                             this.wait();
                     }
                 }
-                Thread.sleep(3000);
+                Thread.sleep(500);
                 removeDeadAnimals();
                 moveAnimals();
                 eatGrass();
