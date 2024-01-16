@@ -39,11 +39,11 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     @Override
     public int getFreeSpaceNumber() {
-        int freeSpaceNumber = upperRight.getX() * upperRight.getY();
-        for (int i = 0; i < upperRight.getX(); i++) {
-            for (int j = 0; j < upperRight.getY(); j++) {
+        int freeSpaceNumber = (upperRight.getX() + 1) * (upperRight.getY() + 1);
+        for (int i = 0; i <= upperRight.getX(); i++) {
+            for (int j = 0; j <= upperRight.getY(); j++) {
                 Vector2d position = new Vector2d(i, j);
-                if (plants.containsKey(position)) {
+                if (plants.containsKey(position) || animals.containsKey(position)) {
                     freeSpaceNumber--;
                 }
             }

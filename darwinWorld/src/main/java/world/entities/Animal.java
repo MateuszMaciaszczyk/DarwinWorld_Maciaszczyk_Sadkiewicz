@@ -176,7 +176,9 @@ public class Animal implements WorldElement {
     }
 
     public void decreaseEnergy(int n) {
-        energy -= n;
+        if (energy != 0) {
+            energy -= n;
+        }
     }
 
     private int[] randomGenes(int[] childGenes) {
