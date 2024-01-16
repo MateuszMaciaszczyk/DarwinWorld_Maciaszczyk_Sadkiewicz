@@ -44,7 +44,7 @@ public class Globe extends AbstractWorldMap{
             animal.move(this);
             animals.remove(oldPosition);
             animals.put(newPosition, animal);
-            mapChanged("Animal moved from: " + oldPosition + " to: " + newPosition);
+            mapChanged();
         }
     }
 }

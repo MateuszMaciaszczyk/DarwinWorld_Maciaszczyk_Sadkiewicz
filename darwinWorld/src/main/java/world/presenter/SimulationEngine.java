@@ -51,4 +51,29 @@ public class SimulationEngine implements Runnable{
     public void run() {
         System.out.println("Thread started.");
     }
+
+    public boolean isRunning() {
+        for (Simulation simulation : this.simulations) {
+            if (simulation.isRunning()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void stop() {
+        for (Simulation simulation : this.simulations) {
+            simulation.pauseSimulation();
+        }
+    }
+
+    public ArrayList<Simulation> getSimulations() {
+        return simulations;
+    }
+
+    public void start() {
+        for (Simulation simulation : this.simulations) {
+            simulation.resumeSimulation();
+        }
+    }
 }

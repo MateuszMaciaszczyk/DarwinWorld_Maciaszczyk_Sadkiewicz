@@ -24,8 +24,11 @@ public class Simulation extends Thread{
     private int minGeneMutation;
     private int maxGeneMutation;
     private int numberOfSpawningPlants;
+    private int day = 0;
+    private String mutationVariant;
+    private volatile boolean running = true;
 
-    public Simulation(int animalAmount, WorldMap map, int energy, int genesNumber, int energyToReproduce, int costOfReproduction, int minGeneMutation, int maxGeneMutation, int numberOfSpawningPlants) {
+    public Simulation(int animalAmount, WorldMap map, int energy, int genesNumber, int energyToReproduce, int costOfReproduction, int minGeneMutation, int maxGeneMutation, int numberOfSpawningPlants, String mutationVariant) {
         this.map = map;
         this.energy = energy;
         this.genesNumber = genesNumber;
@@ -34,6 +37,7 @@ public class Simulation extends Thread{
         this.minGeneMutation = minGeneMutation;
         this.maxGeneMutation = maxGeneMutation;
         this.numberOfSpawningPlants = numberOfSpawningPlants;
+        this.mutationVariant = mutationVariant;
         initializeAnimals(animalAmount);
     }
 
@@ -56,7 +60,10 @@ public class Simulation extends Thread{
         for (Animal deadAnimal : deadAnimals) {
             sum += deadAnimal.getAge();
         }
-        return sum / deadAnimals.size();
+        if (deadAnimals.isEmpty()) {
+            return 0;
+        }
+        else return sum / deadAnimals.size();
     }
 
     public int getAverageChildrenNumber(){
@@ -104,8 +111,7 @@ public class Simulation extends Thread{
             int x = random.nextInt(worldBoundary.upperRight().getX());
             int y = random.nextInt(worldBoundary.upperRight().getY());
             Vector2d randomPosition = new Vector2d(x, y);
-            Animal animal = new Animal(randomPosition, energy, genesNumber, energyToReproduce, costOfReproduction);
-            //System.out.println(animal);
+            Animal animal = new Animal(randomPosition, energy, genesNumber, energyToReproduce, costOfReproduction, mutationVariant);
             map.place(animal);
             animals.add(animal);
         }
@@ -209,8 +215,15 @@ public class Simulation extends Thread{
         return strongestAnimals;
     }
 
+    public int getDay() {
+        return day;
+    }
+
     private void generateGrass() {
         for (int i = 0; i < numberOfSpawningPlants; i++) {
+            if (map.getFreeSpaceNumber() == 0) {
+                return;
+            }
             map.placePlants();
         }
     }
@@ -228,20 +241,44 @@ public class Simulation extends Thread{
     }
 
     public void run() {
-        int i = 0;
-        while (true) {
-            try {
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                synchronized (this) {
+                    while (!running) {
+                            this.wait();
+                    }
+                }
                 Thread.sleep(3000);
                 removeDeadAnimals();
                 moveAnimals();
                 eatGrass();
                 breedAnimals();
                 generateGrass();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                day++;
+
+                if (animals.isEmpty()) {
+                    System.out.println("All animals are dead. Ending simulation.");
+                    break;
+                }
             }
-        }
-    }
+    }catch (InterruptedException e) {
+            throw new RuntimeException(e);}
+}
 
     public List<Animal> getAnimals() { return animals; }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void pauseSimulation() {
+        running = false;
+    }
+
+    public void resumeSimulation() {
+        running = true;
+        synchronized (this) {
+            this.notify();
+        }
+    }
 }
