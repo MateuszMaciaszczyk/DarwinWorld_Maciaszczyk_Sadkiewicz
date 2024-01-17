@@ -127,6 +127,7 @@ public class Animal implements WorldElement {
 
     public void updateChilds() {
         this.childs++;
+        updateOffspring();
     }
 
     public Animal breed(Animal other) {

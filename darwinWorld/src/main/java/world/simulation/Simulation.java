@@ -1,14 +1,14 @@
-package world.presenter;
+package world.simulation;
 
 import world.basic.Vector2d;
 import world.entities.Animal;
-import world.maps.Boundary;
+import world.basic.Boundary;
 import world.maps.WorldMap;
+import world.statistics.SimulationStatistics;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.*;
 
 public class Simulation extends Thread{
     private final List<Animal> animals = new ArrayList<>();
@@ -24,10 +24,11 @@ public class Simulation extends Thread{
     private int maxGeneMutation;
     private int numberOfSpawningPlants;
     private int day = 0;
+    private int simulationLength;
     private String mutationVariant;
     private volatile boolean running = true;
 
-    public Simulation(int animalAmount, WorldMap map, int energy, int genesNumber, int energyToReproduce, int costOfReproduction, int minGeneMutation, int maxGeneMutation, int numberOfSpawningPlants, String mutationVariant) {
+    public Simulation(int animalAmount, WorldMap map, int energy, int genesNumber, int energyToReproduce, int costOfReproduction, int minGeneMutation, int maxGeneMutation, int numberOfSpawningPlants, String mutationVariant, int simulationLength) {
         this.map = map;
         this.energy = energy;
         this.genesNumber = genesNumber;
@@ -37,6 +38,7 @@ public class Simulation extends Thread{
         this.maxGeneMutation = maxGeneMutation;
         this.numberOfSpawningPlants = numberOfSpawningPlants;
         this.mutationVariant = mutationVariant;
+        this.simulationLength = simulationLength;
         initializeAnimals(animalAmount);
         this.stats = new SimulationStatistics(this, map, animals, deadAnimals, childs);
     }
@@ -200,7 +202,7 @@ public class Simulation extends Thread{
                             this.wait();
                     }
                 }
-                Thread.sleep(500);
+                Thread.sleep(simulationLength);
                 stats.updateStatistics(this, map, animals, deadAnimals, childs);
                 removeDeadAnimals();
                 moveAnimals();

@@ -1,4 +1,4 @@
-package world.presenter;
+package world.statistics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 
 import world.entities.Animal;
 import world.maps.WorldMap;
+import world.simulation.Simulation;
 
 public class SimulationStatistics {
     private Simulation simulation;

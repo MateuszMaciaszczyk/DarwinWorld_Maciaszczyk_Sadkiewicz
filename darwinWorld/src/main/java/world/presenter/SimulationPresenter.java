@@ -1,21 +1,21 @@
 package world.presenter;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import world.basic.Vector2d;
 import world.entities.Animal;
 import world.entities.Grass;
 import world.entities.WorldElement;
-import world.maps.Boundary;
-import world.maps.MapChangeListener;
+import world.basic.Boundary;
+import world.basic.MapChangeListener;
 import world.maps.WorldMap;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -23,6 +23,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.Button;
 import javafx.geometry.Pos;
+import world.simulation.Simulation;
+import world.simulation.SimulationEngine;
+import world.statistics.AnimalTracker;
+import world.statistics.SimulationStatistics;
 
 
 public class SimulationPresenter implements MapChangeListener {
@@ -30,6 +34,8 @@ public class SimulationPresenter implements MapChangeListener {
     private Simulation simulation;
     private SimulationEngine simulationEngine;
     private SimulationStatistics stats;
+    private AnimalTracker animalTracker;
+    private Animal selectedAnimal;
     private int animalsAmount;
     private int spawningPlantsAmount;
     private int animalEnergy;
@@ -41,6 +47,8 @@ public class SimulationPresenter implements MapChangeListener {
     private int genomeLength;
     private String mutationVariant;
     private boolean saveStatistics;
+    private boolean animalStatistics = false;
+    private int simulationLength;
 
     public void setWorldMap(WorldMap map) {
         this.worldMap = map;
@@ -72,6 +80,22 @@ public class SimulationPresenter implements MapChangeListener {
     private Label averageChildrenCountLabel;
     @FXML
     private Label dayLabel;
+    @FXML
+    private Label genomeLabel;
+    @FXML
+    private Label activeGeneLabel;
+    @FXML
+    private Label energyLabel;
+    @FXML
+    private Label eatenPlantsLabel;
+    @FXML
+    private Label childrenCountLabel;
+    @FXML
+    private Label descendantsCountLabel;
+    @FXML
+    private Label lifeLengthLabel;
+    @FXML
+    private Label deathDayLabel;
 
     public void setSaveStatistics(boolean saveStatistics) {
         this.saveStatistics = saveStatistics;
@@ -158,18 +182,25 @@ public class SimulationPresenter implements MapChangeListener {
             } else { // Assuming this is an animal
                 Animal animal = (Animal) element;
                 int energy = animal.getEnergy();
+                double energyPercentage = (double) energy / animalEnergy;
                 Color color;
-                if (energy <= 5) {
+                if (energy <= 0.25) {
                     color = Color.BEIGE;
-                } else if (energy <= 10) {
+                } else if (energy <= 0.5) {
                     color = Color.BURLYWOOD;
-                } else if (energy <= 20) {
+                } else if (energy <= 0.75) {
                     color = Color.BROWN;
                 } else {
                     color = Color.BLACK;
                 }
 
                 Circle circle = new Circle();
+                circle.setOnMouseClicked(event -> {
+                    animalStatistics(animal);
+                    if (animal == selectedAnimal) {
+                        label.setStyle("-fx-background-color: blue;");
+                    }
+                });
                 circle.setRadius(5); // Set the radius to half of the cell size
                 circle.setFill(color); // Set the color to the calculated color
                 label.setGraphic(circle);
@@ -178,6 +209,9 @@ public class SimulationPresenter implements MapChangeListener {
                 }
                 else {
                     label.setStyle("-fx-background-color: lightgreen;");
+                }
+                if (animal == selectedAnimal) {
+                    label.setStyle("-fx-background-color: blue;");
                 }
             }
         } else {
@@ -191,6 +225,7 @@ public class SimulationPresenter implements MapChangeListener {
         Platform.runLater(() -> {
             drawMap();
             updateStatistics();
+            updateSelectedAnimalInfo();
         });
     }
 
@@ -211,7 +246,13 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     private void saveStatisticsToCSV() {
+        File file = new File("statistics.csv");
+        boolean fileExists = file.exists();
         try (FileWriter writer = new FileWriter("statistics.csv", true)) {
+            if (!fileExists) {
+                writer.append("Day,Animal count,Grass count,Free space count,Most popular gene,Average energy,Average life length,Average children count\n");
+            }
+
             writer.append(stats.getDay() + ",");
             writer.append(stats.getAnimalAmount() + ",");
             writer.append(stats.getGrassAmount() + ",");
@@ -225,11 +266,43 @@ public class SimulationPresenter implements MapChangeListener {
         }
     }
 
+    private void animalStatistics(Animal animal) {
+        if (animalTracker == null) {
+            animalTracker = new AnimalTracker(
+                    genomeLabel,
+                    activeGeneLabel,
+                    energyLabel,
+                    eatenPlantsLabel,
+                    childrenCountLabel,
+                    descendantsCountLabel,
+                    lifeLengthLabel,
+                    deathDayLabel
+            );
+        }
+        if (animal == selectedAnimal) {
+            selectedAnimal = null;
+        } else {
+            selectedAnimal = animal;
+            animalTracker.selectAnimal(animal);
+            animalStatistics = !animalStatistics;
+        }
+    }
+
+    private void updateSelectedAnimalInfo() {
+        if (animalStatistics) {
+            animalTracker.updateAnimalInfo();
+        }
+    }
+
+    public void setSimulationLength(int simulationLength) {
+        this.simulationLength = simulationLength;
+    }
+
     @FXML
     public void onStartStopClicked() {
         try {
             if (simulationEngine == null) {
-                this.simulation = new Simulation(animalsAmount, worldMap, animalEnergy, genomeLength, reproduceReady, reproduceEnergyCost, minGeneMutation, maxGeneMutation, spawningPlantsAmount, mutationVariant);
+                this.simulation = new Simulation(animalsAmount, worldMap, animalEnergy, genomeLength, reproduceReady, reproduceEnergyCost, minGeneMutation, maxGeneMutation, spawningPlantsAmount, mutationVariant, simulationLength);
                 simulationEngine = new SimulationEngine(new ArrayList<>());
                 simulationEngine.getSimulations().add(simulation);
                 stats = new SimulationStatistics(simulation, worldMap, simulation.getAnimals(), simulation.getDeadAnimals(), simulation.getChilds());

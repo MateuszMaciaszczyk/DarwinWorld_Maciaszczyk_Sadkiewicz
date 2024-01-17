@@ -1,4 +1,4 @@
-package world.presenter;
+package world.statistics;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -33,14 +33,13 @@ public class AnimalTracker {
         updateAnimalInfo();
     }
 
-    private void updateAnimalInfo() {
-        genomeLabel.setText(Arrays.toString(selectedAnimal.getGenes()));
-        activeGeneLabel.setText(Integer.toString(selectedAnimal.getGenes()[selectedAnimal.getPointer()]));
-        energyLabel.setText(Integer.toString(selectedAnimal.getEnergy()));
-        eatenPlantsLabel.setText(Integer.toString(selectedAnimal.getEatenPlants()));
-        childrenCountLabel.setText(Integer.toString(selectedAnimal.getChilds()));
-        descendantsCountLabel.setText(Integer.toString(selectedAnimal.getOffspring()));
-        lifeLengthLabel.setText(Integer.toString(selectedAnimal.getAge()));
-        deathDayLabel.setText(Integer.toString(selectedAnimal.getOffspring()));
+    public void updateAnimalInfo() {
+        genomeLabel.setText("Gene " + Arrays.toString(selectedAnimal.getGenes()));
+        activeGeneLabel.setText("Active gene " + selectedAnimal.getGenes()[selectedAnimal.getPointer()]);
+        energyLabel.setText("Energy level " + selectedAnimal.getEnergy());
+        eatenPlantsLabel.setText("Eaten plants " + selectedAnimal.getEatenPlants());
+        childrenCountLabel.setText("Number of kids " + selectedAnimal.getChilds());
+        descendantsCountLabel.setText("Offsprings " + selectedAnimal.getOffspring());  // TODO check if working correctly
+        lifeLengthLabel.setText("Age " + selectedAnimal.getAge());
     }
 }

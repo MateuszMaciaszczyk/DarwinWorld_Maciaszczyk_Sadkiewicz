@@ -9,6 +9,8 @@ import java.util.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import world.simulation.Simulation;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SimulationTest {
