@@ -41,6 +41,8 @@ public class StartPresenter {
     @FXML
     private TextField genomeLength;
     @FXML
+    private TextField simulationLength;
+    @FXML
     private ChoiceBox MapVariant;
     @FXML
     private ChoiceBox MutationVariant;
@@ -131,6 +133,7 @@ public class StartPresenter {
             int minGeneMutation = parseTextFieldToInt(this.minGeneMutation);
             int maxGeneMutation = parseTextFieldToInt(this.maxGeneMutation);
             int genomeLength = parseTextFieldToInt(this.genomeLength);
+            int simulationLength = parseTextFieldToInt(this.simulationLength);
             boolean saveStatistics = generateCsvCheckBox.isSelected();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/simulation.fxml"));
@@ -158,6 +161,7 @@ public class StartPresenter {
             simulationPresenter.setGenomeLength(genomeLength);
             simulationPresenter.setMutationVariant(mutationVariant);
             simulationPresenter.setSaveStatistics(saveStatistics);
+            simulationPresenter.setSimulationLength(simulationLength);
             simulationPresenter.onStartStopClicked();
 
             Stage simulationStage = new Stage();

@@ -46,13 +46,16 @@
                 <Label text="Length of Genome:" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
                 <TextField fx:id="genomeLength" promptText="Length of Genome" GridPane.columnIndex="1" GridPane.rowIndex="11" />
 
-                <Label text="Map Variant:" GridPane.columnIndex="0" GridPane.rowIndex="12"/>
-                <ChoiceBox fx:id="MapVariant" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                <Label text="Move Duration:" GridPane.columnIndex="0" GridPane.rowIndex="12"/>
+                <TextField fx:id="simulationLength" promptText="Move Duration" GridPane.columnIndex="1" GridPane.rowIndex="12" />
 
-                <Label text="Mutation Variant:" GridPane.columnIndex="0" GridPane.rowIndex="13"/>
-                <ChoiceBox fx:id="MutationVariant" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+                <Label text="Map Variant:" GridPane.columnIndex="0" GridPane.rowIndex="13"/>
+                <ChoiceBox fx:id="MapVariant" GridPane.columnIndex="1" GridPane.rowIndex="13" />
 
-                <CheckBox fx:id="generateCsvCheckBox" text="Save Statistics" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+                <Label text="Mutation Variant:" GridPane.columnIndex="0" GridPane.rowIndex="14"/>
+                <ChoiceBox fx:id="MutationVariant" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+
+                <CheckBox fx:id="generateCsvCheckBox" text="Save Statistics" GridPane.columnIndex="1" GridPane.rowIndex="15" />
             </GridPane>
 
             <VBox spacing="10">

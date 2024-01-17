@@ -1,5 +1,7 @@
 package world.maps;
 
+import world.basic.Boundary;
+import world.basic.MapChangeListener;
 import world.entities.Animal;
 import world.basic.Vector2d;
 import world.entities.WorldElement;
