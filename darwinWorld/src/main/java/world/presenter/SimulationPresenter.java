@@ -19,7 +19,6 @@ import java.util.Arrays;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.Button;
 import javafx.geometry.Pos;
@@ -39,7 +38,6 @@ public class SimulationPresenter implements MapChangeListener {
     private int animalsAmount;
     private int spawningPlantsAmount;
     private int animalEnergy;
-    private int plantEnergy;
     private int reproduceReady;
     private int reproduceEnergyCost;
     private int minGeneMutation;
@@ -49,19 +47,8 @@ public class SimulationPresenter implements MapChangeListener {
     private boolean saveStatistics;
     private boolean animalStatistics = false;
     private int simulationLength;
-
-    public void setWorldMap(WorldMap map) {
-        this.worldMap = map;
-    }
-    private int day = 0;
-    @FXML
-    private Button startButton;
     @FXML
     private Button startStopButton;
-    @FXML
-    private TextField mapWidthField;
-    @FXML
-    private TextField mapHeightField;
     @FXML
     private GridPane mapGrid;
     @FXML
@@ -155,10 +142,10 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     private void drawGrid(Boundary boundary) {
-        for (int i = boundary.lowerLeft().getY(); i <= boundary.upperRight().getY(); i++) {
-            for (int j = boundary.lowerLeft().getX(); j <= boundary.upperRight().getX(); j++) {
+        for (int i = boundary.lowerLeft().y(); i <= boundary.upperRight().y(); i++) {
+            for (int j = boundary.lowerLeft().x(); j <= boundary.upperRight().x(); j++) {
                 Vector2d position = new Vector2d(j, i);
-                drawGridCell(position, j - boundary.lowerLeft().getX() + 1, boundary.upperRight().getY() - i + 1);
+                drawGridCell(position, j - boundary.lowerLeft().x() + 1, boundary.upperRight().y() - i + 1);
             }
         }
     }
@@ -181,28 +168,7 @@ public class SimulationPresenter implements MapChangeListener {
                 label.setStyle("-fx-background-color: green;");
             } else { // Assuming this is an animal
                 Animal animal = (Animal) element;
-                int energy = animal.getEnergy();
-                double energyPercentage = (double) energy / animalEnergy;
-                Color color;
-                if (energy <= 0.25) {
-                    color = Color.BEIGE;
-                } else if (energy <= 0.5) {
-                    color = Color.BURLYWOOD;
-                } else if (energy <= 0.75) {
-                    color = Color.BROWN;
-                } else {
-                    color = Color.BLACK;
-                }
-
-                Circle circle = new Circle();
-                circle.setOnMouseClicked(event -> {
-                    animalStatistics(animal);
-                    if (animal == selectedAnimal) {
-                        label.setStyle("-fx-background-color: blue;");
-                    }
-                });
-                circle.setRadius(5); // Set the radius to half of the cell size
-                circle.setFill(color); // Set the color to the calculated color
+                Circle circle = getCircle(animal, label);
                 label.setGraphic(circle);
                 if (hasGrass) {
                     label.setStyle("-fx-background-color: green;");
@@ -220,6 +186,32 @@ public class SimulationPresenter implements MapChangeListener {
         return label;
     }
 
+    private Circle getCircle(Animal animal, Label label) {
+        int energy = animal.getEnergy();
+        double energyPercentage = (double) energy / animalEnergy;
+        Color color;
+        if (energyPercentage <= 0.25) {
+            color = Color.BEIGE;
+        } else if (energyPercentage <= 0.5) {
+            color = Color.BURLYWOOD;
+        } else if (energyPercentage <= 0.75) {
+            color = Color.BROWN;
+        } else {
+            color = Color.BLACK;
+        }
+
+        Circle circle = new Circle();
+        circle.setOnMouseClicked(event -> {
+            animalStatistics(animal);
+            if (animal == selectedAnimal) {
+                label.setStyle("-fx-background-color: blue;");
+            }
+        });
+        circle.setRadius(5); // Set the radius to half of the cell size
+        circle.setFill(color); // Set the color to the calculated color
+        return circle;
+    }
+
     @Override
     public void mapChanged(WorldMap worldMap) {
         Platform.runLater(() -> {
@@ -230,7 +222,7 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     private void updateStatistics() {
-        stats.updateStatistics(simulation, worldMap, simulation.getAnimals(), simulation.getDeadAnimals(), simulation.getChilds());
+        stats.updateStatistics(simulation, worldMap, simulation.getAnimals(), simulation.getDeadAnimals());
         dayLabel.setText("Day: " + stats.getDay());
         animalCountLabel.setText("Animal count: " + stats.getAnimalAmount());
         grassCountLabel.setText("Grass count: " + stats.getGrassAmount());
@@ -253,14 +245,14 @@ public class SimulationPresenter implements MapChangeListener {
                 writer.append("Day,Animal count,Grass count,Free space count,Most popular gene,Average energy,Average life length,Average children count\n");
             }
 
-            writer.append(stats.getDay() + ",");
-            writer.append(stats.getAnimalAmount() + ",");
-            writer.append(stats.getGrassAmount() + ",");
-            writer.append(stats.getFreeSpace() + ",");
-            writer.append(Arrays.toString(stats.getPopularGenes()) + ",");
-            writer.append(stats.getAverageEnergy() + ",");
-            writer.append(stats.getAverageLifeLength() + ",");
-            writer.append(stats.getAverageChildrenNumber() + "\n");
+            writer.append(String.valueOf(stats.getDay())).append(",");
+            writer.append(String.valueOf(stats.getAnimalAmount())).append(",");
+            writer.append(String.valueOf(stats.getGrassAmount())).append(",");
+            writer.append(String.valueOf(stats.getFreeSpace())).append(",");
+            writer.append(Arrays.toString(stats.getPopularGenes())).append(",");
+            writer.append(String.valueOf(stats.getAverageEnergy())).append(",");
+            writer.append(String.valueOf(stats.getAverageLifeLength())).append(",");
+            writer.append(String.valueOf(stats.getAverageChildrenNumber())).append("\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -305,7 +297,7 @@ public class SimulationPresenter implements MapChangeListener {
                 this.simulation = new Simulation(animalsAmount, worldMap, animalEnergy, genomeLength, reproduceReady, reproduceEnergyCost, minGeneMutation, maxGeneMutation, spawningPlantsAmount, mutationVariant, simulationLength);
                 simulationEngine = new SimulationEngine(new ArrayList<>());
                 simulationEngine.getSimulations().add(simulation);
-                stats = new SimulationStatistics(simulation, worldMap, simulation.getAnimals(), simulation.getDeadAnimals(), simulation.getChilds());
+                stats = new SimulationStatistics(worldMap, simulation.getAnimals(), simulation.getDeadAnimals());
                 simulationEngine.runAsync();
                 startStopButton.setText("Stop");
             }

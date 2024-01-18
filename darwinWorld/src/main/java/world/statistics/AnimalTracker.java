@@ -1,21 +1,19 @@
 package world.statistics;
 
-import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import world.entities.Animal;
-
 import java.util.Arrays;
 
 public class AnimalTracker {
     private Animal selectedAnimal;
-    private Label genomeLabel;
-    private Label activeGeneLabel;
-    private Label energyLabel;
-    private Label eatenPlantsLabel;
-    private Label childrenCountLabel;
-    private Label descendantsCountLabel;
-    private Label lifeLengthLabel;
-    private Label deathDayLabel;
+    private final Label genomeLabel;
+    private final Label activeGeneLabel;
+    private final Label energyLabel;
+    private final Label eatenPlantsLabel;
+    private final Label childrenCountLabel;
+    private final Label descendantsCountLabel;
+    private final Label lifeLengthLabel;
+    private final Label deathDayLabel;
 
     public AnimalTracker(Label genomeLabel, Label activeGeneLabel, Label energyLabel, Label eatenPlantsLabel, Label childrenCountLabel, Label descendantsCountLabel, Label lifeLengthLabel, Label deathDayLabel) {
         this.genomeLabel = genomeLabel;
@@ -34,12 +32,13 @@ public class AnimalTracker {
     }
 
     public void updateAnimalInfo() {
-        genomeLabel.setText("Gene " + Arrays.toString(selectedAnimal.getGenes()));
-        activeGeneLabel.setText("Active gene " + selectedAnimal.getGenes()[selectedAnimal.getPointer()]);
-        energyLabel.setText("Energy level " + selectedAnimal.getEnergy());
-        eatenPlantsLabel.setText("Eaten plants " + selectedAnimal.getEatenPlants());
-        childrenCountLabel.setText("Number of kids " + selectedAnimal.getChilds());
-        descendantsCountLabel.setText("Offsprings " + selectedAnimal.getOffspring());  // TODO check if working correctly
-        lifeLengthLabel.setText("Age " + selectedAnimal.getAge());
+        genomeLabel.setText("Gene: " + Arrays.toString(selectedAnimal.getGenes()));
+        activeGeneLabel.setText("Active gene: " + selectedAnimal.getGenes()[selectedAnimal.getPointer()]);
+        energyLabel.setText("Energy level: " + selectedAnimal.getEnergy());
+        eatenPlantsLabel.setText("Eaten plants: " + selectedAnimal.getEatenPlants());
+        childrenCountLabel.setText("Number of kids: " + selectedAnimal.getChildren());
+        descendantsCountLabel.setText("Offsprings: " + selectedAnimal.getOffspring());
+        lifeLengthLabel.setText("Age: " + selectedAnimal.getAge());
+        deathDayLabel.setText("Death day: " + selectedAnimal.getDeath());
     }
 }

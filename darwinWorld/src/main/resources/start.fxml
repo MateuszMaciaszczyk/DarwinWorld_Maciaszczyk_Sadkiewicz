@@ -60,6 +60,9 @@
 
             <VBox spacing="10">
                 <Button fx:id="startButton" minWidth="150" text="Start Simulation" onAction="#onStartClicked" />
+                <TextField fx:id="configNameField"/>
+                <Button fx:id="loadConfigButton" text="Load Configuration" onAction="#onLoadConfigClicked" />
+                <Button fx:id="saveConfigButton" text="Save Configuration" onAction="#onSaveConfigClicked" />
             </VBox>
         </HBox>
     </center>

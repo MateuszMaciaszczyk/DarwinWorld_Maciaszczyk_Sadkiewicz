@@ -9,13 +9,11 @@ import world.basic.Vector2d;
 
 public class AnimalTest {
 
-    private Vector2d position = new Vector2d(0, 0);
-    private int[] genes = {0, 1, 2, 3, 4, 5, 6, 7};
-    private int energy = 50;
-    private int reproductionEnergyCost = 10;
-    private int energyToReproduce = 20;
-    private int minGeneMutation = 1;
-    private int maxGeneMutation = 3;
+    private final Vector2d position = new Vector2d(0, 0);
+    private final int[] genes = {0, 1, 2, 3, 4, 5, 6, 7};
+    private final int energy = 50;
+    private final int reproductionEnergyCost = 10;
+    private final int energyToReproduce = 20;
 
     @Test
     public void testCanBreed() {
@@ -82,7 +80,7 @@ public class AnimalTest {
     public void testUpdateChilds() {
         Animal animal = new Animal(position, energy, genes, reproductionEnergyCost, energyToReproduce, -1, -2, "Random Mutation");
         animal.updateChilds();
-        assertEquals(1, animal.getChilds(), "Number of children should be incremented after updateChilds() is called.");
+        assertEquals(1, animal.getChildren(), "Number of children should be incremented after updateChilds() is called.");
     }
 
     @Test

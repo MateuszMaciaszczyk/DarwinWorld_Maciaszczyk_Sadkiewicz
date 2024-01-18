@@ -15,17 +15,17 @@ public class Simulation extends Thread{
     private final List<Animal> deadAnimals = new ArrayList<>();
     private final WorldMap map;
     private final SimulationStatistics stats;
-    private final List<Animal> childs = new ArrayList<>();
-    private int energy;
-    private int genesNumber;
-    private int energyToReproduce;
-    private int costOfReproduction;
-    private int minGeneMutation;
-    private int maxGeneMutation;
-    private int numberOfSpawningPlants;
+    private final List<Animal> children = new ArrayList<>();
+    private final int energy;
+    private final int genesNumber;
+    private final int energyToReproduce;
+    private final int costOfReproduction;
+    private final int minGeneMutation;
+    private final int maxGeneMutation;
+    private final int numberOfSpawningPlants;
     private int day = 0;
-    private int simulationLength;
-    private String mutationVariant;
+    private final int simulationLength;
+    private final String mutationVariant;
     private volatile boolean running = true;
 
     public Simulation(int animalAmount, WorldMap map, int energy, int genesNumber, int energyToReproduce, int costOfReproduction, int minGeneMutation, int maxGeneMutation, int numberOfSpawningPlants, String mutationVariant, int simulationLength) {
@@ -40,15 +40,15 @@ public class Simulation extends Thread{
         this.mutationVariant = mutationVariant;
         this.simulationLength = simulationLength;
         initializeAnimals(animalAmount);
-        this.stats = new SimulationStatistics(this, map, animals, deadAnimals, childs);
+        this.stats = new SimulationStatistics(map, animals, deadAnimals);
     }
 
     private void initializeAnimals(int animalAmount) {
         Boundary worldBoundary = map.getCurrentBounds();
         Random random = new Random();
         for (int i = 0; i < animalAmount; i++) {
-            int x = random.nextInt(worldBoundary.upperRight().getX());
-            int y = random.nextInt(worldBoundary.upperRight().getY());
+            int x = random.nextInt(worldBoundary.upperRight().x());
+            int y = random.nextInt(worldBoundary.upperRight().y());
             Vector2d randomPosition = new Vector2d(x, y);
             Animal animal = new Animal(randomPosition, energy, randomGenes(genesNumber), energyToReproduce, costOfReproduction, minGeneMutation, maxGeneMutation, mutationVariant);
             map.place(animal);
@@ -81,13 +81,13 @@ public class Simulation extends Thread{
                         parent1.updateChilds();
                         parent2.updateChilds();
                         map.place(child);
-                        childs.add(child);
+                        children.add(child);
                     }
                 }
             }
         }
-        animals.addAll(childs);
-        childs.clear();
+        animals.addAll(children);
+        children.clear();
     }
 
     private void removeDeadAnimals() {
@@ -95,6 +95,7 @@ public class Simulation extends Thread{
             if (animals.get(i).getEnergy() <= 0) {
                 System.out.println("Zwierzę zginęło!");
                 deadAnimals.add(animals.get(i));
+                animals.get(i).setDeath(day);
                 map.removeDeadAnimal(animals.get(i));
                 animals.remove(animals.get(i));
             }
@@ -114,8 +115,8 @@ public class Simulation extends Thread{
                         animal.getEnergy() > strongest.getEnergy() ||
                         (animal.getEnergy() == strongest.getEnergy() && (
                                 animal.getAge() > strongest.getAge() ||
-                                        (animal.getAge() == strongest.getAge() && animal.getChilds() > strongest.getChilds()) ||
-                                        (animal.getAge() == strongest.getAge() && animal.getChilds() == strongest.getChilds() && Math.random() <= 0.5)
+                                        (animal.getAge() == strongest.getAge() && animal.getChildren() > strongest.getChildren()) ||
+                                        (animal.getAge() == strongest.getAge() && animal.getChildren() == strongest.getChildren() && Math.random() <= 0.5)
                         ))) {
                     strongest = animal;
                 }
@@ -190,10 +191,6 @@ public class Simulation extends Thread{
         return deadAnimals;
     }
 
-    public List<Animal> getChilds() {
-        return childs;
-    }
-
     public void run() {
         try {
             while (!Thread.currentThread().isInterrupted()) {
@@ -203,7 +200,7 @@ public class Simulation extends Thread{
                     }
                 }
                 Thread.sleep(simulationLength);
-                stats.updateStatistics(this, map, animals, deadAnimals, childs);
+                stats.updateStatistics(this, map, animals, deadAnimals);
                 removeDeadAnimals();
                 moveAnimals();
                 eatGrass();
