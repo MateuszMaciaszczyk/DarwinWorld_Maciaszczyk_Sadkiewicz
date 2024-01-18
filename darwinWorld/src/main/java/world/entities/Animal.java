@@ -27,7 +27,7 @@ public class Animal implements WorldElement {
     List<Animal> parents = new ArrayList<>();
 
 
-    public Animal(Vector2d position, int energy, int[] genes, int reproductionEnergyCost, int energyToReproduce, int minGeneMutation, int maxGeneMutation, String mutationVariant) {
+    public Animal(Vector2d position, int energy, int[] genes, int energyToReproduce, int reproductionEnergyCost, int minGeneMutation, int maxGeneMutation, String mutationVariant) {
         this.position = position;
         this.energy = energy;
         this.orientation = (int)(Math.random() * 8);
@@ -130,14 +130,12 @@ public class Animal implements WorldElement {
 
     public Animal breed(Animal other) {
         int childEnergy = 2 * reproductionEnergyCost;
-        this.energy -= reproductionEnergyCost;
-        other.energy -= reproductionEnergyCost;
 
         int[] parent1Genes = this.getGenes();
         int[] parent2Genes = other.getGenes();
         int[] childGenes = new int[parent1Genes.length];
 
-        double ratio = (double) this.energy / (this.energy + other.energy);
+        double ratio = (double) this.energy / (this.energy + other.getEnergy());
         int cutoff = (int) (ratio * parent1Genes.length);
 
         System.arraycopy(parent1Genes, 0, childGenes, 0, cutoff);
@@ -149,6 +147,8 @@ public class Animal implements WorldElement {
             swapGenes(childGenes);
         }
 
+        this.energy -= reproductionEnergyCost;
+        other.energy -= reproductionEnergyCost;
         return new Animal(new Vector2d(0, 0), childEnergy, childGenes, reproductionEnergyCost, energyToReproduce, minGeneMutation, maxGeneMutation, mutationVariant);
     }
 
