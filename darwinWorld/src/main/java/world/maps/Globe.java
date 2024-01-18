@@ -10,7 +10,7 @@ public class Globe extends AbstractWorldMap{
 
     @Override
     public boolean canMoveTo(Vector2d position) {
-        return position.getY() <= upperRight.getY() && position.getY() >= lowerLeft.getY();
+        return position.y() <= upperRight.y() && position.y() >= lowerLeft.y();
     }
 
     @Override
@@ -21,20 +21,20 @@ public class Globe extends AbstractWorldMap{
         if(!canMoveTo(newPosition)) {
             animal.iteratePointer();
         }
-        else if (newPosition.getX() < lowerLeft.getX()) {
-            animal.move(this);
+        else if (newPosition.x() < lowerLeft.x()) {
+            animal.move();
             animals.remove(oldPosition);
-            animal.setPosition(new Vector2d(upperRight.getX(), newPosition.getY()));
+            animal.setPosition(new Vector2d(upperRight.x(), newPosition.y()));
             animals.put(animal.position(), animal);
         }
-        else if (newPosition.getX() > upperRight.getX()) {
-            animal.move(this);
+        else if (newPosition.x() > upperRight.x()) {
+            animal.move();
             animals.remove(oldPosition);
-            animal.setPosition(new Vector2d(lowerLeft.getX(), newPosition.getY()));
+            animal.setPosition(new Vector2d(lowerLeft.x(), newPosition.y()));
             animals.put(animal.position(), animal);
         }
         else {
-            animal.move(this);
+            animal.move();
             animals.remove(oldPosition);
             animals.put(newPosition, animal);
             mapChanged();

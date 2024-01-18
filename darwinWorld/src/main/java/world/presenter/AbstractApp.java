@@ -6,9 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
-
-import javax.swing.*;
 import java.io.IOException;
+import java.util.Objects;
 
 public abstract class AbstractApp extends Application {
     protected FXMLLoader loader;
@@ -20,7 +19,7 @@ public abstract class AbstractApp extends Application {
         loader.setLocation(getClass().getClassLoader().getResource(getFXMLPath()));
         BorderPane viewRoot = loader.load();
 
-        Image icon = new Image(getClass().getResourceAsStream("/icon.png"));
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
         primaryStage.getIcons().add(icon);
 
         configureStage(primaryStage, viewRoot);

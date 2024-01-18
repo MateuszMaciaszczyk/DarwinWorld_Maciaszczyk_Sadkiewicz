@@ -16,6 +16,7 @@ import world.maps.HellsGate;
 import java.io.IOException;
 
 public class StartPresenter {
+    Configuration configuration;
     @FXML
     private TextField widthField;
     @FXML
@@ -50,6 +51,12 @@ public class StartPresenter {
     private Button startButton;
     @FXML
     private CheckBox generateCsvCheckBox;
+    @FXML
+    private TextField configNameField;
+    @FXML
+    private Button loadConfigButton;
+    @FXML
+    private Button saveConfigButton;
 
     @FXML
     public void initialize() {
@@ -58,24 +65,75 @@ public class StartPresenter {
         this.MutationVariant.setItems(FXCollections.observableArrayList("Random Mutation", "Swap 2 Genes"));
         TextField[] fields = {widthField, heightField, initialPlantNumberField, numberOfAnimalsField, startingAnimalEnergyField, numberOfSpawningPlantField, plantEnergyField, reproduceReadyField, reproduceEnergyCostField, minGeneMutation, maxGeneMutation, genomeLength};
         for (TextField field : fields) {
-            field.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (validateInputFields()) {
-                    startButton.setDisable(false);
-                } else {
-                    startButton.setDisable(true);
-                }
-            });
+            field.textProperty().addListener((observable, oldValue, newValue) -> startButton.setDisable(validateInputFields()));
         }
         ChoiceBox[] choiceBoxes = {MapVariant, MutationVariant};
         for (ChoiceBox choiceBox : choiceBoxes) {
-            choiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                if (validateInputFields()) {
-                    startButton.setDisable(false);
-                } else {
-                    startButton.setDisable(true);
-                }
-            });
+            choiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> startButton.setDisable(validateInputFields()));
         }
+    }
+
+    public void onSaveConfigClicked() {
+        String configName = configNameField.getText();
+        if (configName.isEmpty()) {
+            System.out.println("Please enter a configuration name.");
+            return;
+        }
+
+        configuration = new Configuration(configName + ".properties");
+        configuration.setProperty("width", widthField.getText());
+        configuration.setProperty("height", heightField.getText());
+        configuration.setProperty("initialPlantNumber", initialPlantNumberField.getText());
+        configuration.setProperty("animalsAmount", numberOfAnimalsField.getText());
+        configuration.setProperty("startingAnimalEnergy", startingAnimalEnergyField.getText());
+        configuration.setProperty("spawningPlantsAmount", numberOfSpawningPlantField.getText());
+        configuration.setProperty("plantEnergy", plantEnergyField.getText());
+        configuration.setProperty("reproduceReady", reproduceReadyField.getText());
+        configuration.setProperty("reproduceEnergyCost", reproduceEnergyCostField.getText());
+        configuration.setProperty("minGeneMutation", minGeneMutation.getText());
+        configuration.setProperty("maxGeneMutation", maxGeneMutation.getText());
+        configuration.setProperty("genomeLength", genomeLength.getText());
+        configuration.setProperty("simulationLength", simulationLength.getText());
+        configuration.setProperty("mapVariant", (String) MapVariant.getValue());
+        configuration.setProperty("mutationVariant", (String) MutationVariant.getValue());
+
+        try {
+            configuration.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onLoadConfigClicked() {
+        String configName = configNameField.getText();
+        if (configName.isEmpty()) {
+            System.out.println("Please enter a configuration name.");
+            return;
+        }
+
+        configuration = new Configuration(configName + ".properties");
+        try {
+            configuration.load();
+        } catch (IOException e) {
+            System.out.println("Failed to load configuration: " + e.getMessage());
+            return;
+        }
+
+        widthField.setText(configuration.getProperty("width"));
+        heightField.setText(configuration.getProperty("height"));
+        initialPlantNumberField.setText(configuration.getProperty("initialPlantNumber"));
+        numberOfAnimalsField.setText(configuration.getProperty("animalsAmount"));
+        startingAnimalEnergyField.setText(configuration.getProperty("startingAnimalEnergy"));
+        numberOfSpawningPlantField.setText(configuration.getProperty("spawningPlantsAmount"));
+        plantEnergyField.setText(configuration.getProperty("plantEnergy"));
+        reproduceReadyField.setText(configuration.getProperty("reproduceReady"));
+        reproduceEnergyCostField.setText(configuration.getProperty("reproduceEnergyCost"));
+        minGeneMutation.setText(configuration.getProperty("minGeneMutation"));
+        maxGeneMutation.setText(configuration.getProperty("maxGeneMutation"));
+        genomeLength.setText(configuration.getProperty("genomeLength"));
+        simulationLength.setText(configuration.getProperty("simulationLength"));
+        MapVariant.setValue(configuration.getProperty("mapVariant"));
+        MutationVariant.setValue(configuration.getProperty("mutationVariant"));
     }
 
     private boolean validateInputFields() {
@@ -84,32 +142,24 @@ public class StartPresenter {
         for (TextField field : fields) {
             String text = field.getText();
             if (text == null || text.isEmpty()) {
-                return false;
+                return true;
             }
 
             try {
                 int value = Integer.parseInt(text);
                 if (value <= 0) {
-                    return false;
+                    return true;
                 }
             } catch (NumberFormatException e) {
-                return false;
+                return true;
             }
         }
         if (MapVariant.getValue() == null) {
-            return false;
+            return true;
         }
 
         // Check if a mutation variant is selected
-        if (MutationVariant.getValue() == null) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private void validateTextField(TextField widthField, Object o, int i) {
-
+        return MutationVariant.getValue() == null;
     }
 
     private int parseTextFieldToInt(TextField widthField) {

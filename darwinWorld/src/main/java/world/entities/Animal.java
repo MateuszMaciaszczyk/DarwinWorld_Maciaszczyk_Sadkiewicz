@@ -1,7 +1,6 @@
 package world.entities;
 
 import world.basic.MapDirection;
-import world.maps.MoveValidator;
 import world.basic.Vector2d;
 
 import java.util.ArrayList;
@@ -11,17 +10,17 @@ import java.util.List;
 public class Animal implements WorldElement {
     private Vector2d position;
     private int orientation;
-    private int[] genes;
+    private final int[] genes;
     private int energy;
     private int pointer;  // pointer to the current gene
-    private int reproductionEnergyCost;
-    private int energyToReproduce;
-    private int minGeneMutation;
-    private int maxGeneMutation;
-    private String mutationVariant;
+    private final int reproductionEnergyCost;
+    private final int energyToReproduce;
+    private final int minGeneMutation;
+    private final int maxGeneMutation;
+    private final String mutationVariant;
     private boolean alive = true;
     private int age = 0;
-    private int childs = 0;
+    private int children = 0;
     private int offspring = 0;
     private int death = 0;
     private int eatenPlants = 0;
@@ -41,10 +40,6 @@ public class Animal implements WorldElement {
         this.mutationVariant = mutationVariant;
     }
 
-    public int getOrientation() {
-        return orientation;
-    }
-
     public void setPosition(Vector2d position) {
         this.position = position;
     }
@@ -53,8 +48,8 @@ public class Animal implements WorldElement {
         return age;
     }
 
-    public int getChilds() {
-        return childs;
+    public int getChildren() {
+        return children;
     }
 
     public int getOffspring() {
@@ -64,6 +59,10 @@ public class Animal implements WorldElement {
     public void setParents(Animal parent1, Animal parent2) {
         this.parents.add(parent1);
         this.parents.add(parent2);
+    }
+
+    public void setDeath(int death) {
+        this.death = death;
     }
 
     public void updateOffspring() {
@@ -97,10 +96,9 @@ public class Animal implements WorldElement {
 
     public void die() {
         this.alive = false;
-        this.death = this.age;
     }
 
-    public void move(MoveValidator validator) {
+    public void move() {
         this.position = getNextMove();
         this.orientation = getNextOrientation();
         pointer = (pointer + 1) % genes.length;
@@ -126,7 +124,7 @@ public class Animal implements WorldElement {
     }
 
     public void updateChilds() {
-        this.childs++;
+        this.children++;
         updateOffspring();
     }
 
@@ -145,10 +143,11 @@ public class Animal implements WorldElement {
         System.arraycopy(parent1Genes, 0, childGenes, 0, cutoff);
         System.arraycopy(parent2Genes, cutoff, childGenes, cutoff, parent1Genes.length - cutoff);
 
-        if (mutationVariant.equals("Random Mutation"))
-            childGenes = randomGenes(childGenes);
-        else
-            childGenes = swapGenes(childGenes);
+        if (mutationVariant.equals("Random Mutation")) {
+            randomGenes(childGenes);
+        } else {
+            swapGenes(childGenes);
+        }
 
         return new Animal(new Vector2d(0, 0), childEnergy, childGenes, reproductionEnergyCost, energyToReproduce, minGeneMutation, maxGeneMutation, mutationVariant);
     }
@@ -159,22 +158,20 @@ public class Animal implements WorldElement {
         }
     }
 
-    private int[] randomGenes(int[] childGenes) {
+    private void randomGenes(int[] childGenes) {
         int numberOfMutations = (int)(Math.random() * (maxGeneMutation - minGeneMutation + 1)) + minGeneMutation;
         for (int i = 0; i < numberOfMutations; i++) {
             int index = (int)(Math.random() * childGenes.length);
             childGenes[index] = (int)(Math.random() * 8);
         }
-        return childGenes;
     }
 
-    private int[] swapGenes(int[] childGenes) {
+    private void swapGenes(int[] childGenes) {
         int numberOfGene1 = (int)(Math.random() * childGenes.length);
         int numberOfGene2 = (int)(Math.random() * childGenes.length);
         int temp = childGenes[numberOfGene1];
         childGenes[numberOfGene1] = childGenes[numberOfGene2];
         childGenes[numberOfGene2] = temp;
-        return childGenes;
     }
 
     public int getPointer() {
@@ -183,5 +180,13 @@ public class Animal implements WorldElement {
 
     public int getEatenPlants() {
         return eatenPlants;
+    }
+
+    public String getDeath() {
+        if (death == 0) {
+            return "Alive";
+        } else {
+            return String.valueOf(death);
+        }
     }
 }

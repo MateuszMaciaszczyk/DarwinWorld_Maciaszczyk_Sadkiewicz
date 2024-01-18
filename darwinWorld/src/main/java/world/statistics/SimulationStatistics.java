@@ -1,6 +1,5 @@
 package world.statistics;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,49 +9,28 @@ import world.maps.WorldMap;
 import world.simulation.Simulation;
 
 public class SimulationStatistics {
-    private Simulation simulation;
     private int day = 0;
-    private int animalAmount = 0;
-    private int grassAmount = 0;
-    private int freeSpace = 0;
-    private int averageEnergy = 0;
-    private int averageLifeLength = 0;
-    private double averageChildrenNumber = 0.0;
-    private int[] popularGenes;
-    private List<Animal> animals = new ArrayList<>();
-    private List<Animal> deadAnimals = new ArrayList<>();
+    private int animalAmount;
+    private int grassAmount;
+    private List<Animal> animals;
+    private List<Animal> deadAnimals;
     private WorldMap map;
-    private List<Animal> childs = new ArrayList<>();
 
-    public SimulationStatistics(Simulation simulation, WorldMap map, List<Animal> animals, List<Animal> deadAnimals, List<Animal> childs) {
+    public SimulationStatistics(WorldMap map, List<Animal> animals, List<Animal> deadAnimals) {
         this.animals = animals;
         this.deadAnimals = deadAnimals;
-        this.childs = childs;
-        this.simulation = simulation;
         this.map = map;
         this.animalAmount = animals.size();
         this.grassAmount = map.getGrassesNumber();
-        this.freeSpace = map.getFreeSpaceNumber();
-        this.averageEnergy = getAverageLifeLength();
-        this.averageLifeLength = getAverageLifeLength();
-        this.averageChildrenNumber = getAverageChildrenNumber();
-        this.popularGenes = getPopularGenes();
     }
 
-    public void updateStatistics(Simulation simulation, WorldMap map, List<Animal> animals, List<Animal> deadAnimals, List<Animal> childs){
+    public void updateStatistics(Simulation simulation, WorldMap map, List<Animal> animals, List<Animal> deadAnimals){
         this.animals = animals;
         this.deadAnimals = deadAnimals;
-        this.childs = childs;
-        this.simulation = simulation;
         this.map = map;
         this.day = simulation.getDay();
         this.animalAmount = animals.size();
         this.grassAmount = map.getGrassesNumber();
-        this.freeSpace = map.getFreeSpaceNumber();
-        this.averageEnergy = getAverageEnergy();
-        this.averageLifeLength = getAverageLifeLength();
-        this.averageChildrenNumber = getAverageChildrenNumber();
-        this.popularGenes = getPopularGenes();
     }
 
     public int getDay() {
@@ -81,9 +59,6 @@ public class SimulationStatistics {
         if (animals.isEmpty()) {
             return 0;
         }
-        if (animals.size() == 0) {
-            return 0;
-        }
         else return sum / animals.size();
     }
 
@@ -101,7 +76,7 @@ public class SimulationStatistics {
     public double getAverageChildrenNumber(){
         int sum = 0;
         for (Animal animal : animals) {
-            sum += animal.getChilds();
+            sum += animal.getChildren();
         }
         if (animals.isEmpty()) {
             return 0.0;

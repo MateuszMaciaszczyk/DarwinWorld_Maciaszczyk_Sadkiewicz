@@ -2,10 +2,8 @@ package world.maps;
 
 import world.basic.Vector2d;
 import world.entities.Animal;
-import java.util.Random;
 
 public class HellsGate extends AbstractWorldMap{
-    private final Random random = new Random();
 
     public HellsGate(int width, int height, int grassNumber, int costOfReproduction, int plantsEnergy) {
         super(width, height, grassNumber, costOfReproduction, plantsEnergy);
@@ -13,7 +11,7 @@ public class HellsGate extends AbstractWorldMap{
 
     @Override
     public boolean canMoveTo(Vector2d position) {
-        return position.getY() <= upperRight.getY() && position.getY() >= lowerLeft.getY() && position.getX() <= upperRight.getX() && position.getX() >= lowerLeft.getX();
+        return position.y() <= upperRight.y() && position.y() >= lowerLeft.y() && position.x() <= upperRight.x() && position.x() >= lowerLeft.x();
     }
 
     @Override
@@ -28,7 +26,7 @@ public class HellsGate extends AbstractWorldMap{
         }
 
         animals.remove(oldPosition);
-        animal.move(this);
+        animal.move();
         animal.setPosition(newPosition);
         animals.put(animal.position(), animal);
 
@@ -36,8 +34,8 @@ public class HellsGate extends AbstractWorldMap{
     }
 
     private Vector2d getRandomPosition() {
-        int x = (int)(Math.random() * (upperRight.getX() - lowerLeft.getX() + 1)) + lowerLeft.getX();
-        int y = (int)(Math.random() * (upperRight.getY() - lowerLeft.getY() + 1)) + lowerLeft.getY();
+        int x = (int)(Math.random() * (upperRight.x() - lowerLeft.x() + 1)) + lowerLeft.x();
+        int y = (int)(Math.random() * (upperRight.y() - lowerLeft.y() + 1)) + lowerLeft.y();
         return new Vector2d(x, y);
     }
 }

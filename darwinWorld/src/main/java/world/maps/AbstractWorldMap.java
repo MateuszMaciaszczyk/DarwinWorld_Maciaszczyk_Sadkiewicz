@@ -41,9 +41,9 @@ public abstract class AbstractWorldMap implements WorldMap {
 
     @Override
     public int getFreeSpaceNumber() {
-        int freeSpaceNumber = (upperRight.getX() + 1) * (upperRight.getY() + 1);
-        for (int i = 0; i <= upperRight.getX(); i++) {
-            for (int j = 0; j <= upperRight.getY(); j++) {
+        int freeSpaceNumber = (upperRight.x() + 1) * (upperRight.y() + 1);
+        for (int i = 0; i <= upperRight.x(); i++) {
+            for (int j = 0; j <= upperRight.y(); j++) {
                 Vector2d position = new Vector2d(i, j);
                 if (plants.containsKey(position) || animals.containsKey(position)) {
                     freeSpaceNumber--;
@@ -117,26 +117,26 @@ public abstract class AbstractWorldMap implements WorldMap {
     }
 
     public Vector2d getPreferredPosition() {
-        int preferredHeight = (upperRight.getY() - lowerLeft.getY() + 1) / 5; // 20% of the map height
-        int preferredLowerY = lowerLeft.getY() + 2 * preferredHeight;
-        int preferredUpperY = upperRight.getY() - 2 * preferredHeight;
+        int preferredHeight = (upperRight.y() - lowerLeft.y() + 1) / 5; // 20% of the map height
+        int preferredLowerY = lowerLeft.y() + 2 * preferredHeight;
+        int preferredUpperY = upperRight.y() - 2 * preferredHeight;
         double chance = Math.random();
         int x, y;
 
         if (chance <= 0.8) {
             // Generate position in the preferred area
-            x = (int)(Math.random() * (upperRight.getX() - lowerLeft.getX() + 1)) + lowerLeft.getX();
+            x = (int)(Math.random() * (upperRight.x() - lowerLeft.x() + 1)) + lowerLeft.x();
             y = (int)(Math.random() * (preferredUpperY - preferredLowerY + 1)) + preferredLowerY;
         } else {
             // Generate position outside the preferred area
             if (Math.random() < 0.5) {
                 // Generate position in the lower non-preferred area
-                x = (int)(Math.random() * (upperRight.getX() - lowerLeft.getX() + 1)) + lowerLeft.getX();
-                y = (int)(Math.random() * (preferredLowerY - lowerLeft.getY() + 1)) + lowerLeft.getY();
+                x = (int)(Math.random() * (upperRight.x() - lowerLeft.x() + 1)) + lowerLeft.x();
+                y = (int)(Math.random() * (preferredLowerY - lowerLeft.y() + 1)) + lowerLeft.y();
             } else {
                 // Generate position in the upper non-preferred area
-                x = (int)(Math.random() * (upperRight.getX() - lowerLeft.getX() + 1)) + lowerLeft.getX();
-                y = (int)(Math.random() * (upperRight.getY() - preferredUpperY + 1)) + preferredUpperY;
+                x = (int)(Math.random() * (upperRight.x() - lowerLeft.x() + 1)) + lowerLeft.x();
+                y = (int)(Math.random() * (upperRight.y() - preferredUpperY + 1)) + preferredUpperY;
             }
         }
 

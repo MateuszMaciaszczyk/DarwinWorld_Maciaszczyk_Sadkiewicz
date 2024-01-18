@@ -15,20 +15,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SimulationTest {
     private Simulation simulation;
-    private WorldMap map;
     private List<Animal> animals;
-    private final int mapWidth = 10;
-    private final int mapHeight = 10;
-    private final int grassNumber = 5;
-    private final int plantsEnergy = 20;
-    private int reproductionEnergyCost = 10;
 
 
     @BeforeEach
     public void setUp() {
-        map = new Globe(mapWidth, mapHeight, grassNumber, reproductionEnergyCost, plantsEnergy);
+        int mapWidth = 10;
+        int mapHeight = 10;
+        int grassNumber = 5;
+        int plantsEnergy = 20;
+        int reproductionEnergyCost = 10;
+        WorldMap map = new Globe(mapWidth, mapHeight, grassNumber, reproductionEnergyCost, plantsEnergy);
 
-        simulation = new Simulation(10, map, 50, 8, 30, 20, 1, 3, 5, "default");
+        simulation = new Simulation(10, map, 50, 8, 30, 20, 1, 3, 5, "default", 100);
 
         animals = simulation.getAnimals();
         for (int i = 0; i < 10; i++) {

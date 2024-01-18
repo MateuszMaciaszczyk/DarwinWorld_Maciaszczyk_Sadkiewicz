@@ -14,18 +14,16 @@ public class AbstractWorldMapTest {
     private final int mapWidth = 10;
     private final int mapHeight = 10;
     private final int grassNumber = 5;
-    private final int costOfReproduction = 10;
-    private final int plantsEnergy = 20;
-    private Vector2d position = new Vector2d(0, 0);
-    private int[] genes = {0, 1, 2, 3, 4, 5, 6, 7};
-    private int energy = 100;
-    private int reproductionEnergyCost = 10;
-    private int energyToReproduce = 50;
-    private int minGeneMutation = 1;
-    private int maxGeneMutation = 3;
+    private final Vector2d position = new Vector2d(0, 0);
+    private final int[] genes = {0, 1, 2, 3, 4, 5, 6, 7};
+    private final int energy = 100;
+    private final int reproductionEnergyCost = 10;
+    private final int energyToReproduce = 50;
 
     @BeforeEach
     public void setUp() {
+        int costOfReproduction = 10;
+        int plantsEnergy = 20;
         map = new Globe(mapWidth, mapHeight, grassNumber, costOfReproduction, plantsEnergy);
     }
 

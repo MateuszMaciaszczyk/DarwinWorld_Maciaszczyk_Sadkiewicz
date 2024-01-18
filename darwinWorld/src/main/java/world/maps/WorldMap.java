@@ -6,9 +6,6 @@ import world.entities.Animal;
 import world.basic.Vector2d;
 import world.entities.WorldElement;
 
-import java.util.Set;
-import java.util.UUID;
-
 /**
  * The interface responsible for interacting with the map of the world.
  * Assumes that Vector2d and MoveDirection classes are defined.
@@ -56,13 +53,9 @@ public interface WorldMap extends MoveValidator {
      */
     WorldElement objectAt(Vector2d position);
 
-    Set<WorldElement> getElements();
-
     Boundary getCurrentBounds();
 
     void addMapChangeListener(MapChangeListener consoleMapDisplay);
-
-    UUID getId();
 
     void placePlants();
 

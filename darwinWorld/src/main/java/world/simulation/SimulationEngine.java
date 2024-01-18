@@ -1,7 +1,5 @@
 package world.simulation;
 
-import world.simulation.Simulation;
-
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +16,7 @@ public class SimulationEngine implements Runnable{
 
     public void runSync() {
         for (Simulation simulation : simulations) {
-            simulation.run();
+            simulation.start();
         }
     }
 
@@ -36,7 +34,7 @@ public class SimulationEngine implements Runnable{
 
     public void runAsyncInThreadPool(){
         for(Simulation simulation : simulations){
-            executorService.submit(simulation::run);
+            executorService.submit(simulation);
         }
 
         executorService.shutdown();
